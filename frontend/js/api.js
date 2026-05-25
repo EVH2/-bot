@@ -13,13 +13,7 @@
   let API_BASE_URL;
   
   // 如果是 Cloudflare Pages 域名或 localhost
-  if (currentHost.includes('pages.dev') || currentHost.includes('pages.cloudflare') || currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    // 开发模式：假设 Worker 运行在同域名或指定端口
-    API_BASE_URL = '';  // 使用相对路径，由 Cloudflare 自动路由
-  } else {
-    // 生产模式：假设 Worker 在 /api 路径
-    API_BASE_URL = '';
-  }
+  let API_BASE_URL = 'https://clawbot-api.xxxx.workers.dev';
   
   /**
    * 通用 API 请求函数
