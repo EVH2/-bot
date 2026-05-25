@@ -13,7 +13,7 @@
   let API_BASE_URL;
   
   // 如果是 Cloudflare Pages 域名或 localhost
-  let API_BASE_URL = 'https://clawbot-api.xxxx.workers.dev';
+  let API_BASE_URL = 'https://3f76e9cd.bot-7fs.pages.dev';
   
   /**
    * 通用 API 请求函数
