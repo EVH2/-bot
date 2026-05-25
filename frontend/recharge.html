@@ -2,468 +2,416 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>充值 - ClawBot AI</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>小灵唠微信ai · 充值中心</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: url('https://cdn.phototourl.com/free/2026-05-25-1338b2c9-de7f-411f-bbbd-b0bd84954c58.png') no-repeat center center fixed;
+      background-size: cover;
+    }
+
     .page-container {
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 2rem;
+      padding: 1.5rem;
     }
-    
+
     .page-card {
       max-width: 800px;
       margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
       overflow: hidden;
     }
-    
+
     .page-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #1f2b48;
       color: white;
-      padding: 2rem;
+      padding: 1.8rem;
       text-align: center;
     }
-    
     .page-header h1 {
-      margin: 0;
-      font-size: 1.75rem;
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 0.3rem;
     }
-    
+    .page-header p {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+
     .page-content {
       padding: 2rem;
     }
-    
+
+    /* 余额展示 */
     .balance-display {
       text-align: center;
-      padding: 2rem;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-      border-radius: 16px;
+      padding: 1.8rem;
+      background: #f1f5f9;
+      border-radius: 24px;
       margin-bottom: 2rem;
     }
-    
     .balance-label {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      color: #4a5b7a;
+      margin-bottom: 0.4rem;
     }
-    
     .balance-value {
-      font-size: 3rem;
-      font-weight: bold;
-      color: #667eea;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #1f2b48;
     }
-    
     .balance-unit {
       font-size: 1rem;
-      color: #999;
-      margin-left: 0.5rem;
+      color: #5e6f9d;
+      margin-left: 0.3rem;
     }
-    
-    .section-title {
-      font-size: 1.1rem;
-      color: #333;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid #f0f0f0;
-    }
-    
+
+    /* 表单区域 */
     .recharge-form {
-      background: #f8f9fa;
+      background: #ffffff;
+      border: 1px solid #eef2f8;
+      border-radius: 24px;
       padding: 1.5rem;
-      border-radius: 12px;
       margin-bottom: 2rem;
     }
-    
-    .form-group {
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2b48;
       margin-bottom: 1rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #e2e8f0;
     }
-    
+    .info-box {
+      background: #eef5ff;
+      border-left: 4px solid #1f2b48;
+      padding: 0.8rem 1rem;
+      border-radius: 16px;
+      font-size: 0.85rem;
+      color: #1f2b48;
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
     .form-group label {
       display: block;
-      margin-bottom: 0.5rem;
-      color: #555;
+      font-size: 0.85rem;
       font-weight: 500;
+      color: #2d3a5e;
+      margin-bottom: 0.4rem;
     }
-    
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-    
-    .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-    
     .quick-amounts {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-      gap: 0.75rem;
-      margin-bottom: 1rem;
+      gap: 0.8rem;
     }
-    
     .quick-amount {
-      padding: 0.75rem;
-      background: white;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 40px;
+      padding: 0.6rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: 0.2s;
     }
-    
-    .quick-amount:hover,
+    .quick-amount:hover {
+      border-color: #1f2b48;
+      background: #f1f5f9;
+    }
     .quick-amount.active {
-      border-color: #667eea;
-      background: rgba(102, 126, 234, 0.05);
+      border-color: #1f2b48;
+      background: #eef2ff;
     }
-    
     .quick-amount .value {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #333;
-    }
-    
-    .quick-amount .label {
-      font-size: 0.75rem;
-      color: #999;
-    }
-    
-    .btn-recharge {
-      width: 100%;
-      padding: 1rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
       font-size: 1.1rem;
       font-weight: 600;
+      color: #1f2b48;
+    }
+    .quick-amount .label {
+      font-size: 0.7rem;
+      color: #5e6f9d;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1px solid #cfdde6;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: #1f2b48;
+    }
+    .btn-recharge {
+      width: 100%;
+      padding: 0.8rem;
+      background: #1f2b48;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      font-size: 1rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 1rem;
+      transition: 0.2s;
+      margin-top: 0.5rem;
     }
-    
     .btn-recharge:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      background: #2e3b5e;
+      transform: scale(0.98);
     }
-    
     .btn-recharge:disabled {
-      opacity: 0.7;
+      opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
     }
-    
+
+    /* 记录列表 */
     .records-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2b48;
       margin-bottom: 1rem;
     }
-    
     .records-list {
       max-height: 300px;
       overflow-y: auto;
     }
-    
     .record-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: #f8fafc;
       padding: 1rem;
-      background: #f8f9fa;
-      border-radius: 10px;
-      margin-bottom: 0.5rem;
-    }
-    
-    .record-info {
-      flex: 1;
-    }
-    
-    .record-amount {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #667eea;
-    }
-    
-    .record-status {
-      padding: 0.25rem 0.75rem;
       border-radius: 20px;
-      font-size: 0.8rem;
+      margin-bottom: 0.6rem;
+    }
+    .record-amount {
+      font-weight: 700;
+      color: #1f2b48;
+    }
+    .record-status {
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
       font-weight: 500;
     }
-    
-    .status-pending {
-      background: #fff3cd;
-      color: #856404;
-    }
-    
-    .status-approved {
-      background: #d4edda;
-      color: #155724;
-    }
-    
-    .status-rejected {
-      background: #f8d7da;
-      color: #721c24;
-    }
-    
+    .status-pending { background: #fef3e2; color: #b45f2b; }
+    .status-approved { background: #e0f2e9; color: #2b6e4e; }
+    .status-rejected { background: #fee7e5; color: #b3372a; }
     .record-time {
-      font-size: 0.8rem;
-      color: #999;
-      margin-top: 0.25rem;
+      font-size: 0.7rem;
+      color: #7c8ba0;
+      margin-top: 0.2rem;
     }
-    
     .empty-records {
       text-align: center;
-      padding: 2rem;
-      color: #999;
+      padding: 1.5rem;
+      color: #7c8ba0;
     }
-    
+
     .back-link {
       display: inline-block;
       margin-bottom: 1rem;
       color: white;
       text-decoration: none;
-      opacity: 0.9;
+      font-size: 0.9rem;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
-    
     .back-link:hover {
-      opacity: 1;
       text-decoration: underline;
     }
-    
     .success-msg {
-      background: #d4edda;
-      color: #155724;
-      padding: 0.75rem;
-      border-radius: 8px;
+      background: #e0f2e9;
+      color: #2b6e4e;
+      padding: 0.7rem;
+      border-radius: 60px;
+      text-align: center;
+      font-size: 0.85rem;
       margin-bottom: 1rem;
       display: none;
-      text-align: center;
-    }
-    
-    .info-box {
-      background: #e7f3ff;
-      border: 1px solid #b3d8ff;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-      color: #004085;
     }
   </style>
 </head>
 <body>
-  <div class="page-container">
-    <a href="/dashboard" class="back-link">← 返回控制台</a>
-    
-    <div class="page-card">
-      <div class="page-header">
-        <h1>💰 充值中心</h1>
-        <p>充值消息条数，继续使用</p>
+<div class="page-container">
+  <a href="/dashboard" class="back-link">← 返回控制台</a>
+  <div class="page-card">
+    <div class="page-header">
+      <h1>充值中心</h1>
+      <p>充值消息条数，继续对话</p>
+    </div>
+    <div class="page-content">
+      <div class="balance-display">
+        <div class="balance-label">当前剩余消息</div>
+        <div class="balance-value"><span id="currentBalance">-</span><span class="balance-unit">条</span></div>
       </div>
-      
-      <div class="page-content">
-        <!-- 当前余额 -->
-        <div class="balance-display">
-          <div class="balance-label">当前剩余消息</div>
-          <div class="balance-value" id="currentBalance">-</div>
-          <span class="balance-unit">条</span>
+
+      <div id="successMsg" class="success-msg"></div>
+
+      <div class="recharge-form">
+        <div class="section-title">申请充值</div>
+        <div class="info-box">
+          提交申请后管理员会尽快处理，完成后消息条数自动增加。
         </div>
-        
-        <div id="successMsg" class="success-msg"></div>
-        
-        <!-- 充值表单 -->
-        <div class="recharge-form">
-          <h3 class="section-title">📝 申请充值</h3>
-          
-          <div class="info-box">
-            💡 请联系管理员进行充值，提交申请后管理员会尽快处理。
-          </div>
-          
-          <div class="form-group">
-            <label>选择充值数量</label>
-            <div class="quick-amounts">
-              <div class="quick-amount" onclick="selectAmount(50)">
-                <div class="value">50</div>
-                <div class="label">条</div>
-              </div>
-              <div class="quick-amount" onclick="selectAmount(100)">
-                <div class="value">100</div>
-                <div class="label">条</div>
-              </div>
-              <div class="quick-amount" onclick="selectAmount(200)">
-                <div class="value">200</div>
-                <div class="label">条</div>
-              </div>
-              <div class="quick-amount" onclick="selectAmount(500)">
-                <div class="value">500</div>
-                <div class="label">条</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="customAmount">自定义数量</label>
-            <input type="number" id="customAmount" placeholder="输入数量" min="1" oninput="clearQuickSelect()">
-          </div>
-          
-          <div class="form-group">
-            <label for="note">备注（选填）</label>
-            <textarea id="note" placeholder="如有其他需求请备注说明" rows="2"></textarea>
-          </div>
-          
-          <button class="btn-recharge" id="rechargeBtn" onclick="submitRecharge()">提交充值申请</button>
-        </div>
-        
-        <!-- 充值记录 -->
-        <div class="records-section">
-          <h3 class="section-title">📋 充值记录</h3>
-          <div class="records-list" id="recordsList">
-            <div class="empty-records">加载中...</div>
+
+        <div class="form-group">
+          <label>选择数量</label>
+          <div class="quick-amounts">
+            <div class="quick-amount" data-amount="50" onclick="selectAmount(50, this)"><div class="value">50</div><div class="label">条</div></div>
+            <div class="quick-amount" data-amount="100" onclick="selectAmount(100, this)"><div class="value">100</div><div class="label">条</div></div>
+            <div class="quick-amount" data-amount="200" onclick="selectAmount(200, this)"><div class="value">200</div><div class="label">条</div></div>
+            <div class="quick-amount" data-amount="500" onclick="selectAmount(500, this)"><div class="value">500</div><div class="label">条</div></div>
           </div>
         </div>
+
+        <div class="form-group">
+          <label for="customAmount">自定义数量</label>
+          <input type="number" id="customAmount" placeholder="输入数量" min="1" oninput="clearQuickSelect()">
+        </div>
+
+        <div class="form-group">
+          <label for="note">备注 (选填)</label>
+          <textarea id="note" placeholder="如有特殊需求，可以备注说明" rows="2"></textarea>
+        </div>
+
+        <button class="btn-recharge" id="rechargeBtn" onclick="submitRecharge()">提交充值申请</button>
+      </div>
+
+      <div class="records-section">
+        <h3>充值记录</h3>
+        <div class="records-list" id="recordsList"><div class="empty-records">加载中...</div></div>
       </div>
     </div>
   </div>
+</div>
 
-  <script src="../js/api.js"></script>
-  <script>
-    // 检查登录
-    if (!localStorage.getItem('token')) {
-      window.location.href = '/login';
-    }
-    
-    let selectedAmount = 0;
-    
-    // 初始化
-    async function init() {
-      await loadProfile();
-      await loadRecords();
-    }
-    
-    // 加载用户信息
-    async function loadProfile() {
-      try {
-        const data = await api.get('/api/user/profile');
-        if (data.code === 0) {
-          document.getElementById('currentBalance').textContent = data.data.message_count;
-        }
-      } catch (err) {
-        console.error('Load profile error:', err);
+<script src="../js/api.js"></script>
+<script>
+  if (!localStorage.getItem('token')) window.location.href = '/login';
+
+  let selectedAmount = 0;
+  let selectedElement = null;
+
+  async function init() {
+    await loadProfile();
+    await loadRecords();
+  }
+
+  async function loadProfile() {
+    try {
+      const res = await api.get('/api/user/profile');
+      if (res.code === 0) {
+        document.getElementById('currentBalance').innerText = res.data.message_count;
       }
-    }
-    
-    // 加载充值记录
-    async function loadRecords() {
-      try {
-        const data = await api.get('/api/recharge/records');
-        const container = document.getElementById('recordsList');
-        
-        if (data.code === 0 && data.data.length > 0) {
-          container.innerHTML = data.data.map(record => {
-            const time = new Date(record.created_at * 1000).toLocaleString('zh-CN');
-            const statusClass = `status-${record.status}`;
-            const statusText = {
-              pending: '待处理',
-              approved: '已通过',
-              rejected: '已拒绝'
-            }[record.status] || record.status;
-            
-            return `
-              <div class="record-item">
-                <div class="record-info">
-                  <div class="record-amount">+${record.amount} 条</div>
-                  <div class="record-time">${time}</div>
-                  ${record.note ? `<div style="font-size:0.8rem;color:#666;margin-top:0.25rem;">备注: ${escapeHtml(record.note)}</div>` : ''}
-                </div>
-                <span class="record-status ${statusClass}">${statusText}</span>
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadRecords() {
+    try {
+      const res = await api.get('/api/recharge/records');
+      const container = document.getElementById('recordsList');
+      if (res.code === 0 && res.data?.length) {
+        container.innerHTML = res.data.map(r => {
+          const time = new Date(r.created_at * 1000).toLocaleString('zh-CN');
+          const statusClass = `status-${r.status}`;
+          let statusText = { pending: '待处理', approved: '已通过', rejected: '已拒绝' }[r.status] || r.status;
+          return `
+            <div class="record-item">
+              <div>
+                <div class="record-amount">+${r.amount} 条</div>
+                <div class="record-time">${time}</div>
+                ${r.note ? `<div style="font-size:0.75rem;color:#7c8ba0;margin-top:4px;">备注: ${escapeHtml(r.note)}</div>` : ''}
               </div>
-            `;
-          }).join('');
-        } else {
-          container.innerHTML = '<div class="empty-records">暂无充值记录</div>';
-        }
-      } catch (err) {
-        console.error('Load records error:', err);
-        document.getElementById('recordsList').innerHTML = '<div class="empty-records">加载失败</div>';
+              <span class="record-status ${statusClass}">${statusText}</span>
+            </div>
+          `;
+        }).join('');
+      } else {
+        container.innerHTML = '<div class="empty-records">暂无充值记录</div>';
       }
+    } catch(e) {
+      document.getElementById('recordsList').innerHTML = '<div class="empty-records">加载失败</div>';
     }
-    
-    // 选择快捷金额
-    function selectAmount(amount) {
-      selectedAmount = amount;
-      document.getElementById('customAmount').value = '';
-      
-      document.querySelectorAll('.quick-amount').forEach(el => el.classList.remove('active'));
-      event.currentTarget.classList.add('active');
+  }
+
+  function selectAmount(amount, el) {
+    selectedAmount = amount;
+    if (selectedElement) selectedElement.classList.remove('active');
+    selectedElement = el;
+    selectedElement.classList.add('active');
+    document.getElementById('customAmount').value = '';
+  }
+
+  function clearQuickSelect() {
+    selectedAmount = 0;
+    if (selectedElement) {
+      selectedElement.classList.remove('active');
+      selectedElement = null;
     }
-    
-    // 清除快捷选择
-    function clearQuickSelect() {
-      selectedAmount = 0;
-      document.querySelectorAll('.quick-amount').forEach(el => el.classList.remove('active'));
+  }
+
+  async function submitRecharge() {
+    let amount = selectedAmount;
+    const customVal = parseInt(document.getElementById('customAmount').value);
+    if (!amount && customVal > 0) amount = customVal;
+    const note = document.getElementById('note').value.trim();
+    const btn = document.getElementById('rechargeBtn');
+    const successDiv = document.getElementById('successMsg');
+
+    if (!amount || amount < 1) {
+      alert('请选择或输入充值数量');
+      return;
     }
-    
-    // 提交充值申请
-    async function submitRecharge() {
-      const amount = selectedAmount || parseInt(document.getElementById('customAmount').value);
-      const note = document.getElementById('note').value.trim();
-      const btn = document.getElementById('rechargeBtn');
-      const successMsg = document.getElementById('successMsg');
-      
-      if (!amount || amount < 1) {
-        alert('请选择或输入充值数量');
-        return;
+
+    btn.disabled = true;
+    btn.textContent = '提交中...';
+    successDiv.style.display = 'none';
+
+    try {
+      const res = await api.post('/api/recharge/apply', { amount, note });
+      if (res.code === 0) {
+        successDiv.innerText = res.message || '申请已提交，管理员会尽快处理';
+        successDiv.style.display = 'block';
+        // 清空表单
+        selectedAmount = 0;
+        if (selectedElement) selectedElement.classList.remove('active');
+        selectedElement = null;
+        document.getElementById('customAmount').value = '';
+        document.getElementById('note').value = '';
+        await loadRecords();
+      } else {
+        alert(res.message || '提交失败');
       }
-      
-      btn.disabled = true;
-      btn.textContent = '提交中...';
-      successMsg.style.display = 'none';
-      
-      try {
-        const data = await api.post('/api/recharge/apply', { amount, note });
-        
-        if (data.code === 0) {
-          successMsg.textContent = '✅ ' + data.message;
-          successMsg.style.display = 'block';
-          
-          // 清空表单
-          selectedAmount = 0;
-          document.getElementById('customAmount').value = '';
-          document.getElementById('note').value = '';
-          document.querySelectorAll('.quick-amount').forEach(el => el.classList.remove('active'));
-          
-          // 刷新记录
-          await loadRecords();
-        } else {
-          alert(data.message);
-        }
-      } catch (err) {
-        alert('提交失败：' + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '提交充值申请';
-      }
+    } catch(err) {
+      alert('提交失败，请重试');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '提交充值申请';
     }
-    
-    // HTML 转义
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-    
-    init();
-  </script>
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  init();
+</script>
 </body>
 </html>
