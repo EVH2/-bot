@@ -2,97 +2,420 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>创建智能体 - ClawBot AI</title>
-  <link rel="stylesheet" href="../css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>小灵唠微信AI - 创建智能体</title>
   <style>
-    .page-container {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 2rem;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    
-    .page-card {
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: url('https://cdn.phototourl.com/free/2026-05-25-1338b2c9-de7f-411f-bbbd-b0bd84954c58.png') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .container {
       max-width: 800px;
       margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.25);
       overflow: hidden;
     }
-    
-    .page-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    .card-header {
+      padding: 1.6rem 2rem;
+      background: #1f2b48;
       color: white;
-      padding: 2rem;
-      text-align: center;
     }
-    
-    .page-header h1 {
-      margin: 0;
-      font-size: 1.75rem;
+    .card-header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
     }
-    
-    .page-header p {
-      margin: 0.5rem 0 0 0;
-      opacity: 0.9;
+    .card-header p {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 0.3rem;
     }
-    
-    .page-content {
+
+    .card-body {
       padding: 2rem;
     }
-    
+
     .form-section {
       margin-bottom: 2rem;
     }
-    
     .form-section h3 {
-      font-size: 1.1rem;
-      color: #667eea;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2b48;
       margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #e2e8f0;
     }
-    
+
     .form-row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: 1fr 1fr;
       gap: 1rem;
     }
-    
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
     }
-    
     .form-group label {
       display: block;
-      margin-bottom: 0.5rem;
-      color: #555;
+      font-size: 0.85rem;
       font-weight: 500;
+      color: #2d3a5e;
+      margin-bottom: 0.3rem;
     }
-    
     .form-group input,
     .form-group select,
     .form-group textarea {
       width: 100%;
-      padding: 0.75rem 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      box-sizing: border-box;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.9rem;
+      border: 1px solid #cfdde6;
+      border-radius: 16px;
+      background: white;
+      transition: 0.2s;
+      outline: none;
       font-family: inherit;
     }
-    
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #5e6f9d;
+      box-shadow: 0 0 0 3px rgba(94,111,157,0.2);
     }
-    
     .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .hint {
+      font-size: 0.7rem;
+      color: #7c8ba0;
+      margin-top: 0.25rem;
+    }
+
+    /* 切换按钮组 */
+    .toggle-group {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .toggle-item {
+      background: #f0f2f6;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .toggle-item.active {
+      background: #1f2b48;
+      color: white;
+    }
+    .toggle-item input {
+      display: none;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .checkbox-group input {
+      width: 18px;
+      height: 18px;
+      accent-color: #1f2b48;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .btn-primary {
+      flex: 1;
+      background: #1f2b48;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-primary:hover {
+      background: #2e3b5e;
+      transform: scale(0.98);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background: #eef2f6;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-secondary:hover {
+      background: #e2e6ec;
+    }
+
+    .error-msg {
+      background: #fff0f0;
+      color: #c23d3d;
+      padding: 0.7rem 1rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      margin-bottom: 1.2rem;
+      text-align: center;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .card-body {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="/dashboard" class="back-link">← 返回控制台</a>
+  <div class="card">
+    <div class="card-header">
+      <h1 id="pageTitle">小灵唠微信AI · 创建智能体</h1>
+      <p id="pageDesc">设定你的 AI 角色，开启专属对话</p>
+    </div>
+    <div class="card-body">
+      <div id="errorMsg" class="error-msg"></div>
+      <form id="agentForm">
+        <div class="form-section">
+          <h3>基础信息</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">角色名称 *</label>
+              <input type="text" id="name" placeholder="给角色起个名字" maxlength="50" required>
+            </div>
+            <div class="form-group">
+              <label for="gender">性别</label>
+              <select id="gender">
+                <option value="女">女</option>
+                <option value="男">男</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>人设设定</h3>
+          <div class="form-group">
+            <label for="persona">性格设定</label>
+            <textarea id="persona" placeholder="温柔体贴、活泼开朗、傲娇…"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="background">背景故事</label>
+            <textarea id="background" placeholder="角色的身份、经历、世界观"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="inner_thought">内心独白</label>
+            <textarea id="inner_thought" placeholder="角色内心的真实想法（可选）"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="actions">动作习惯</label>
+            <textarea id="actions" placeholder="小动作、习惯性反应"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="speaking_style">说话风格</label>
+            <textarea id="speaking_style" placeholder="语气词、常用句式"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="rules">角色规则</label>
+            <textarea id="rules" placeholder="需要遵守的规则或禁忌"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="custom_prompt">自定义提示词（高级）</label>
+            <textarea id="custom_prompt" placeholder="直接追加到系统提示词，用于精细控制"></textarea>
+            <div class="hint">会与上面设定合并使用</div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>回复模式</h3>
+          <div class="form-group">
+            <label>句子长度</label>
+            <div class="toggle-group">
+              <label class="toggle-item active" id="shortMode">
+                <input type="radio" name="prefer_short" value="1" checked> 短句模式
+              </label>
+              <label class="toggle-item" id="longMode">
+                <input type="radio" name="prefer_short" value="0"> 长句模式
+              </label>
+            </div>
+            <div class="hint">短句口语化、活泼；长句完整连贯</div>
+          </div>
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="continuous_send">
+              <label for="continuous_send">连续发送模式（逐句发送，更真实）</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn-secondary" onclick="history.back()">取消</button>
+          <button type="submit" class="btn-primary" id="submitBtn">保存智能体</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const agentId = urlParams.get('id');
+  const isEdit = !!agentId;
+
+  if (!localStorage.getItem('token')) {
+    window.location.href = '/login';
+  }
+
+  if (isEdit) {
+    document.getElementById('pageTitle').innerText = '小灵唠微信AI · 编辑智能体';
+    document.getElementById('pageDesc').innerText = '修改你的角色设定';
+    loadAgentData();
+  }
+
+  async function loadAgentData() {
+    try {
+      const res = await api.get('/api/agents');
+      const agent = res.data.find(a => a.id == agentId);
+      if (!agent) {
+        alert('智能体不存在');
+        window.location.href = '/dashboard';
+        return;
+      }
+      document.getElementById('name').value = agent.name || '';
+      document.getElementById('gender').value = agent.gender || '女';
+      document.getElementById('persona').value = agent.persona || '';
+      document.getElementById('background').value = agent.background || '';
+      document.getElementById('inner_thought').value = agent.inner_thought || '';
+      document.getElementById('actions').value = agent.actions || '';
+      document.getElementById('speaking_style').value = agent.speaking_style || '';
+      document.getElementById('rules').value = agent.rules || '';
+      document.getElementById('custom_prompt').value = agent.custom_prompt || '';
+
+      if (agent.prefer_short == 1) {
+        document.getElementById('shortMode').classList.add('active');
+        document.getElementById('longMode').classList.remove('active');
+        document.querySelector('input[name="prefer_short"][value="1"]').checked = true;
+      } else {
+        document.getElementById('longMode').classList.add('active');
+        document.getElementById('shortMode').classList.remove('active');
+        document.querySelector('input[name="prefer_short"][value="0"]').checked = true;
+      }
+      document.getElementById('continuous_send').checked = agent.continuous_send == 1;
+    } catch (err) {
+      console.error(err);
+      alert('加载数据失败');
+    }
+  }
+
+  document.querySelectorAll('.toggle-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const name = this.querySelector('input').name;
+      document.querySelectorAll(`.toggle-item input[name="${name}"]`).forEach(inp => {
+        inp.closest('.toggle-item').classList.remove('active');
+      });
+      this.classList.add('active');
+    });
+  });
+
+  document.getElementById('agentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errorMsg = document.getElementById('errorMsg');
+    const submitBtn = document.getElementById('submitBtn');
+    errorMsg.style.display = 'none';
+
+    const payload = {
+      name: document.getElementById('name').value.trim(),
+      gender: document.getElementById('gender').value,
+      persona: document.getElementById('persona').value.trim(),
+      background: document.getElementById('background').value.trim(),
+      inner_thought: document.getElementById('inner_thought').value.trim(),
+      actions: document.getElementById('actions').value.trim(),
+      speaking_style: document.getElementById('speaking_style').value.trim(),
+      rules: document.getElementById('rules').value.trim(),
+      custom_prompt: document.getElementById('custom_prompt').value.trim(),
+      prefer_short: document.querySelector('input[name="prefer_short"]:checked').value === '1',
+      continuous_send: document.getElementById('continuous_send').checked
+    };
+    if (!payload.name) {
+      errorMsg.textContent = '角色名称不能为空';
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '保存中...';
+    try {
+      let data;
+      if (isEdit) {
+        data = await api.put(`/api/agents/${agentId}`, payload);
+      } else {
+        data = await api.post('/api/agents', payload);
+      }
+      if (data.code === 0) {
+        alert(isEdit ? '更新成功' : '创建成功');
+        window.location.href = '/dashboard';
+      } else {
+        errorMsg.textContent = data.message || '操作失败';
+        errorMsg.style.display = 'block';
+      }
+    } catch (err) {
+      errorMsg.textContent = '保存失败：' + err.message;
+      errorMsg.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '保存智能体';
+    }
+  });
+</script>
+</body>
+</html>    .form-group textarea {
       min-height: 100px;
       resize: vertical;
     }
