@@ -30,10 +30,10 @@ crons = ["0 8 * * *"]
 # 生产环境配置
 [env.production]
 name = "clawbot-saas"
-vars = {
-  JWT_SECRET = "${JWT_SECRET}",
-  PLATFORM_NAME = "ClawBot AI"
-}
+
+[env.production.vars]
+JWT_SECRET = "my-fake-secret-123"
+PLATFORM_NAME = "ClawBot AI"
 
 # 开发环境配置
 [env.dev]
