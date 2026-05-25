@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClawBot AI - 智能角色扮演平台</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* 首页特定样式 */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .hero h1 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .hero .subtitle {
+      font-size: 1.5rem;
+      opacity: 0.95;
+      margin-bottom: 2rem;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .btn-hero {
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary-hero {
+      background: white;
+      color: #667eea;
+    }
+    
+    .btn-primary-hero:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .btn-secondary-hero {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+    
+    .btn-secondary-hero:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-3px);
+    }
+    
+    .features {
+      padding: 5rem 2rem;
+      background: #f8f9fa;
+    }
+    
+    .features h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      color: #333;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .feature-card {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+    }
+    
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #667eea;
+    }
+    
+    .feature-card p {
+      color: #666;
+      line-height: 1.8;
+    }
+    
+    .how-it-works {
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .how-it-works h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+    }
+    
+    .steps {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .step {
+      text-align: center;
+      flex: 1;
+      min-width: 200px;
+      max-width: 280px;
+    }
+    
+    .step-number {
+      width: 60px;
+      height: 60px;
+      background: white;
+      color: #667eea;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .step h3 {
+      margin-bottom: 0.5rem;
+    }
+    
+    .footer {
+      padding: 2rem;
+      text-align: center;
+      background: #2d3748;
+      color: #a0aec0;
+    }
+    
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      .hero .subtitle {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">ClawBot AI</a>
+      <div class="nav-links">
+        <a href="/login" class="nav-link">登录</a>
+        <a href="/register" class="btn-nav">立即开始</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero 区域 -->
+  <section class="hero">
+    <h1>🎭 ClawBot AI</h1>
+    <p class="subtitle">智能角色扮演 · 长期记忆 · 真人模拟体验</p>
+    <div class="hero-buttons">
+      <a href="/register" class="btn-hero btn-primary-hero">免费开始</a>
+      <a href="#features" class="btn-hero btn-secondary-hero">了解更多</a>
+    </div>
+  </section>
+
+  <!-- 功能特点 -->
+  <section class="features" id="features">
+    <h2>✨ 平台特色</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>长期记忆系统</h3>
+        <p>AI 会记住你们的每一次对话，学习你的偏好和习惯。随着交流深入，角色会变得越来越了解你，提供更个性化的互动体验。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>真人模拟对话</h3>
+        <p>支持短句/长句多种回复模式，可选的连续发送功能，让 AI 的回复更接近真人的聊天习惯，告别死板的固定回复。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>完全自定义人设</h3>
+        <p>从性格到背景，从说话风格到行为习惯，你可以塑造任何你想要的角色。支持详细的角色设定，让 AI 更符合你的想象。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>微信推送支持</h3>
+        <p>可选的消息推送功能，让 AI 能够像真人一样给你发送消息。支持定时早安推送，让你的虚拟伙伴更加贴心。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>隐私安全保障</h3>
+        <p>所有对话数据安全加密存储，严格保护用户隐私。你可以放心地与 AI 角色交流，无需担心信息泄露。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <h3>零成本体验</h3>
+        <p>注册即送免费消息额度，通过邀请好友还可获得更多奖励。低成本开启你的 AI 角色扮演之旅。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 使用流程 -->
+  <section class="how-it-works">
+    <h2>🚀 快速开始</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>注册账号</h3>
+        <p>填写信息完成注册</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>创建角色</h3>
+        <p>设定你的 AI 伙伴</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>开始对话</h3>
+        <p>与角色展开互动</p>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <h3>深度交流</h3>
+        <p>AI 会记住一切</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <p>&copy; 2024 ClawBot AI. 智能角色扮演平台</p>
+  </footer>
+</body>
+</html>

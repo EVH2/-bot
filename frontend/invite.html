@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>邀请好友 - ClawBot AI</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .page-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 2rem;
+    }
+    
+    .page-card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    
+    .page-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .page-header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+    
+    .page-content {
+      padding: 2rem;
+    }
+    
+    .invite-code-section {
+      text-align: center;
+      padding: 2rem;
+      background: #f8f9fa;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+    }
+    
+    .invite-code-label {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    
+    .invite-code-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #667eea;
+      letter-spacing: 4px;
+      margin-bottom: 1rem;
+    }
+    
+    .copy-btn {
+      padding: 0.75rem 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .invite-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #667eea;
+    }
+    
+    .stat-card .label {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+    
+    .section-title {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .invite-link-item {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .invite-link-info {
+      flex: 1;
+    }
+    
+    .invite-link-code {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+    
+    .invite-link-stats {
+      font-size: 0.8rem;
+      color: #999;
+    }
+    
+    .use-invite-section {
+      background: #fff8e6;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+    }
+    
+    .use-invite-section h3 {
+      margin: 0 0 1rem 0;
+      color: #856404;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .input-group input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .btn-apply {
+      padding: 0.75rem 1.5rem;
+      background: #f0ad4e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-apply:hover {
+      background: #ec971f;
+    }
+    
+    .btn-apply:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: white;
+      text-decoration: none;
+      opacity: 0.9;
+    }
+    
+    .back-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    
+    .success-msg {
+      background: #d4edda;
+      color: #155724;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      display: none;
+      text-align: center;
+    }
+    
+    .error-msg {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      display: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <a href="/dashboard" class="back-link">← 返回控制台</a>
+    
+    <div class="page-card">
+      <div class="page-header">
+        <h1>🎁 邀请好友</h1>
+        <p>邀请好友注册，双方都能获得奖励！</p>
+      </div>
+      
+      <div class="page-content">
+        <!-- 专属邀请码 -->
+        <div class="invite-code-section">
+          <div class="invite-code-label">你的专属邀请码</div>
+          <div class="invite-code-value" id="myCode">加载中...</div>
+          <button class="copy-btn" onclick="copyInviteCode()">复制邀请码</button>
+        </div>
+        
+        <!-- 邀请统计 -->
+        <div class="invite-stats">
+          <div class="stat-card">
+            <div class="value" id="invitedCount">-</div>
+            <div class="label">已邀请人数</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="rewardAmount">50</div>
+            <div class="label">每次奖励条数</div>
+          </div>
+        </div>
+        
+        <!-- 使用邀请码 -->
+        <div class="use-invite-section">
+          <h3>📥 使用邀请码</h3>
+          <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">
+            如果你有朋友的邀请码，在这里输入使用
+          </p>
+          <div class="input-group">
+            <input type="text" id="inviteCodeInput" placeholder="输入邀请码" maxlength="20">
+            <button class="btn-apply" id="applyBtn" onclick="applyInviteCode()">使用</button>
+          </div>
+          <div id="successMsg" class="success-msg"></div>
+          <div id="errorMsg" class="error-msg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    // 检查登录
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/login';
+    }
+    
+    let myInviteCode = '';
+    
+    // 加载邀请信息
+    async function loadInviteInfo() {
+      try {
+        const data = await api.get('/api/invite/info');
+        if (data.code === 0) {
+          myInviteCode = data.data.invite_code;
+          document.getElementById('myCode').textContent = myInviteCode || '暂无';
+          document.getElementById('invitedCount').textContent = data.data.invited_count || 0;
+        }
+      } catch (err) {
+        console.error('Load invite info error:', err);
+      }
+    }
+    
+    // 复制邀请码
+    function copyInviteCode() {
+      if (!myInviteCode) return;
+      
+      navigator.clipboard.writeText(myInviteCode).then(() => {
+        alert('邀请码已复制到剪贴板！');
+      }).catch(() => {
+        // 降级处理
+        const input = document.createElement('input');
+        input.value = myInviteCode;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        alert('邀请码已复制到剪贴板！');
+      });
+    }
+    
+    // 使用邀请码
+    async function applyInviteCode() {
+      const code = document.getElementById('inviteCodeInput').value.trim().toUpperCase();
+      const successMsg = document.getElementById('successMsg');
+      const errorMsg = document.getElementById('errorMsg');
+      const applyBtn = document.getElementById('applyBtn');
+      
+      if (!code) {
+        errorMsg.textContent = '请输入邀请码';
+        errorMsg.style.display = 'block';
+        successMsg.style.display = 'none';
+        return;
+      }
+      
+      applyBtn.disabled = true;
+      errorMsg.style.display = 'none';
+      successMsg.style.display = 'none';
+      
+      try {
+        const data = await api.post('/api/invite/apply', { invite_code: code });
+        
+        if (data.code === 0) {
+          successMsg.innerHTML = `🎉 邀请码使用成功！获得了 <strong>${data.data.reward}</strong> 条消息奖励！`;
+          successMsg.style.display = 'block';
+          document.getElementById('inviteCodeInput').value = '';
+          
+          // 更新余额显示
+          const profile = await api.get('/api/user/profile');
+          if (profile.code === 0) {
+            document.getElementById('rewardAmount').textContent = profile.data.message_count;
+          }
+        } else {
+          errorMsg.textContent = data.message;
+          errorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        errorMsg.textContent = '使用失败：' + err.message;
+        errorMsg.style.display = 'block';
+      } finally {
+        applyBtn.disabled = false;
+      }
+    }
+    
+    // 初始化
+    loadInviteInfo();
+  </script>
+</body>
+</html>

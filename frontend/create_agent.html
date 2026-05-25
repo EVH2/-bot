@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创建智能体 - ClawBot AI</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .page-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 2rem;
+    }
+    
+    .page-card {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    
+    .page-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .page-header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+    
+    .page-header p {
+      margin: 0.5rem 0 0 0;
+      opacity: 0.9;
+    }
+    
+    .page-content {
+      padding: 2rem;
+    }
+    
+    .form-section {
+      margin-bottom: 2rem;
+    }
+    
+    .form-section h3 {
+      font-size: 1.1rem;
+      color: #667eea;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 500;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .form-group .hint {
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+    
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #f5f7fa;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .toggle-item.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .toggle-item input {
+      display: none;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #667eea;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn-primary {
+      flex: 1;
+      padding: 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      padding: 1rem 2rem;
+      background: #f0f0f0;
+      color: #666;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    
+    .error-msg {
+      background: #fee;
+      color: #c33;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: white;
+      text-decoration: none;
+      opacity: 0.9;
+    }
+    
+    .back-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <a href="/dashboard" class="back-link">← 返回控制台</a>
+    
+    <div class="page-card">
+      <div class="page-header">
+        <h1 id="pageTitle">🎭 创建智能体</h1>
+        <p id="pageDesc">设定你的 AI 角色，开始对话</p>
+      </div>
+      
+      <div class="page-content">
+        <div id="errorMsg" class="error-msg"></div>
+        
+        <form id="agentForm">
+          <!-- 基础信息 -->
+          <div class="form-section">
+            <h3>📝 基础信息</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">角色名称 *</label>
+                <input type="text" id="name" name="name" placeholder="给角色起个名字" required maxlength="50">
+              </div>
+              
+              <div class="form-group">
+                <label for="gender">性别</label>
+                <select id="gender" name="gender">
+                  <option value="女">女</option>
+                  <option value="男">男</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 人设设定 -->
+          <div class="form-section">
+            <h3>🎨 人设设定</h3>
+            
+            <div class="form-group">
+              <label for="persona">性格设定</label>
+              <textarea id="persona" name="persona" placeholder="描述角色的性格特点，如：温柔体贴、活泼开朗、有点傲娇..."></textarea>
+              <div class="hint">提示：详细的性格设定有助于 AI 更好地扮演角色</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="background">背景故事</label>
+              <textarea id="background" name="background" placeholder="角色的背景故事、身份、职业等..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="inner_thought">内心独白</label>
+              <textarea id="inner_thought" name="inner_thought" placeholder="角色内心真实的想法（可能不会直接说出口）..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="actions">动作习惯</label>
+              <textarea id="actions" name="actions" placeholder="角色的小动作、习惯，如：紧张时会捏衣角、开心时会蹦蹦跳跳..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="speaking_style">说话风格</label>
+              <textarea id="speaking_style" name="speaking_style" placeholder="角色的说话习惯，如：喜欢用叠词、经常说\"呀\"、语气词很多..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="rules">角色规则</label>
+              <textarea id="rules" name="rules" placeholder="角色需要遵守的规则或限制..."></textarea>
+            </div>
+          </div>
+          
+          <!-- 自定义人设 -->
+          <div class="form-section">
+            <h3>✨ 自定义人设（高级）</h3>
+            
+            <div class="form-group">
+              <label for="custom_prompt">自定义提示词</label>
+              <textarea id="custom_prompt" name="custom_prompt" placeholder="高级用户可在此处添加更详细的角色设定，将与上述设定合并使用..." style="min-height: 150px;"></textarea>
+              <div class="hint">提示：这里的内容会直接追加到系统提示词中，可用于添加更复杂的角色设定</div>
+            </div>
+          </div>
+          
+          <!-- 回复模式 -->
+          <div class="form-section">
+            <h3>💬 回复模式</h3>
+            
+            <div class="form-group">
+              <label>句子长度</label>
+              <div class="toggle-group">
+                <label class="toggle-item active" id="shortMode">
+                  <input type="radio" name="prefer_short" value="1" checked>
+                  短句模式
+                </label>
+                <label class="toggle-item" id="longMode">
+                  <input type="radio" name="prefer_short" value="0">
+                  长句模式
+                </label>
+              </div>
+              <div class="hint">短句：每句话不超过20字，口语化 | 长句：完整长句，逻辑连贯</div>
+            </div>
+            
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="continuous_send" name="continuous_send" value="1">
+                <label for="continuous_send">启用连续发送模式</label>
+              </div>
+              <div class="hint">开启后，AI 的回复会被拆分成多个短句依次发送，更接近真人聊天体验</div>
+            </div>
+          </div>
+          
+          <div class="btn-group">
+            <button type="button" class="btn-secondary" onclick="history.back()">取消</button>
+            <button type="submit" class="btn-primary" id="submitBtn">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const agentId = urlParams.get('id');
+    let isEdit = false;
+    
+    // 检查登录
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/login';
+    }
+    
+    // 如果是编辑模式，加载现有数据
+    if (agentId) {
+      isEdit = true;
+      document.getElementById('pageTitle').textContent = '✏️ 编辑智能体';
+      document.getElementById('pageDesc').textContent = '修改你的 AI 角色设定';
+      loadAgentData();
+    }
+    
+    // 加载智能体数据
+    async function loadAgentData() {
+      try {
+        const agents = await api.get('/api/agents');
+        const agent = agents.data.find(a => a.id === parseInt(agentId));
+        
+        if (!agent) {
+          alert('智能体不存在');
+          window.location.href = '/dashboard';
+          return;
+        }
+        
+        // 填充表单
+        document.getElementById('name').value = agent.name || '';
+        document.getElementById('gender').value = agent.gender || '女';
+        document.getElementById('persona').value = agent.persona || '';
+        document.getElementById('background').value = agent.background || '';
+        document.getElementById('inner_thought').value = agent.inner_thought || '';
+        document.getElementById('actions').value = agent.actions || '';
+        document.getElementById('speaking_style').value = agent.speaking_style || '';
+        document.getElementById('rules').value = agent.rules || '';
+        document.getElementById('custom_prompt').value = agent.custom_prompt || '';
+        
+        // 回复模式
+        if (agent.prefer_short == 1) {
+          document.getElementById('shortMode').classList.add('active');
+          document.getElementById('longMode').classList.remove('active');
+          document.querySelector('input[name="prefer_short"][value="1"]').checked = true;
+        } else {
+          document.getElementById('longMode').classList.add('active');
+          document.getElementById('shortMode').classList.remove('active');
+          document.querySelector('input[name="prefer_short"][value="0"]').checked = true;
+        }
+        
+        if (agent.continuous_send == 1) {
+          document.getElementById('continuous_send').checked = true;
+        }
+      } catch (err) {
+        console.error('Load agent error:', err);
+        alert('加载数据失败');
+      }
+    }
+    
+    // 模式切换
+    document.querySelectorAll('.toggle-item').forEach(item => {
+      item.addEventListener('click', function() {
+        const name = this.querySelector('input').name;
+        document.querySelectorAll(`.toggle-item input[name="${name}"]`).forEach(input => {
+          input.closest('.toggle-item').classList.remove('active');
+        });
+        this.classList.add('active');
+      });
+    });
+    
+    // 表单提交
+    document.getElementById('agentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const errorMsg = document.getElementById('errorMsg');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      errorMsg.style.display = 'none';
+      
+      const formData = {
+        name: document.getElementById('name').value.trim(),
+        gender: document.getElementById('gender').value,
+        persona: document.getElementById('persona').value.trim(),
+        background: document.getElementById('background').value.trim(),
+        inner_thought: document.getElementById('inner_thought').value.trim(),
+        actions: document.getElementById('actions').value.trim(),
+        speaking_style: document.getElementById('speaking_style').value.trim(),
+        rules: document.getElementById('rules').value.trim(),
+        custom_prompt: document.getElementById('custom_prompt').value.trim(),
+        prefer_short: document.querySelector('input[name="prefer_short"]:checked').value === '1',
+        continuous_send: document.getElementById('continuous_send').checked
+      };
+      
+      if (!formData.name) {
+        errorMsg.textContent = '请输入角色名称';
+        errorMsg.style.display = 'block';
+        return;
+      }
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = '保存中...';
+      
+      try {
+        let data;
+        if (isEdit) {
+          data = await api.put(`/api/agents/${agentId}`, formData);
+        } else {
+          data = await api.post('/api/agents', formData);
+        }
+        
+        if (data.code === 0) {
+          alert(isEdit ? '更新成功' : '创建成功');
+          window.location.href = '/dashboard';
+        } else {
+          errorMsg.textContent = data.message;
+          errorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        errorMsg.textContent = '保存失败：' + err.message;
+        errorMsg.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '保存';
+      }
+    });
+  </script>
+</body>
+</html>

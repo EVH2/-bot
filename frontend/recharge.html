@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>充值 - ClawBot AI</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .page-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 2rem;
+    }
+    
+    .page-card {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    
+    .page-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .page-header h1 {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+    
+    .page-content {
+      padding: 2rem;
+    }
+    
+    .balance-display {
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      border-radius: 16px;
+      margin-bottom: 2rem;
+    }
+    
+    .balance-label {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    
+    .balance-value {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #667eea;
+    }
+    
+    .balance-unit {
+      font-size: 1rem;
+      color: #999;
+      margin-left: 0.5rem;
+    }
+    
+    .section-title {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .recharge-form {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 500;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .quick-amounts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    
+    .quick-amount {
+      padding: 0.75rem;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .quick-amount:hover,
+    .quick-amount.active {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .quick-amount .value {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .quick-amount .label {
+      font-size: 0.75rem;
+      color: #999;
+    }
+    
+    .btn-recharge {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+    
+    .btn-recharge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-recharge:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .records-section h3 {
+      margin-bottom: 1rem;
+    }
+    
+    .records-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .record-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .record-info {
+      flex: 1;
+    }
+    
+    .record-amount {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #667eea;
+    }
+    
+    .record-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-approved {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .record-time {
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+    
+    .empty-records {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+    }
+    
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: white;
+      text-decoration: none;
+      opacity: 0.9;
+    }
+    
+    .back-link:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    
+    .success-msg {
+      background: #d4edda;
+      color: #155724;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+      text-align: center;
+    }
+    
+    .info-box {
+      background: #e7f3ff;
+      border: 1px solid #b3d8ff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      color: #004085;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <a href="/dashboard" class="back-link">← 返回控制台</a>
+    
+    <div class="page-card">
+      <div class="page-header">
+        <h1>💰 充值中心</h1>
+        <p>充值消息条数，继续使用</p>
+      </div>
+      
+      <div class="page-content">
+        <!-- 当前余额 -->
+        <div class="balance-display">
+          <div class="balance-label">当前剩余消息</div>
+          <div class="balance-value" id="currentBalance">-</div>
+          <span class="balance-unit">条</span>
+        </div>
+        
+        <div id="successMsg" class="success-msg"></div>
+        
+        <!-- 充值表单 -->
+        <div class="recharge-form">
+          <h3 class="section-title">📝 申请充值</h3>
+          
+          <div class="info-box">
+            💡 请联系管理员进行充值，提交申请后管理员会尽快处理。
+          </div>
+          
+          <div class="form-group">
+            <label>选择充值数量</label>
+            <div class="quick-amounts">
+              <div class="quick-amount" onclick="selectAmount(50)">
+                <div class="value">50</div>
+                <div class="label">条</div>
+              </div>
+              <div class="quick-amount" onclick="selectAmount(100)">
+                <div class="value">100</div>
+                <div class="label">条</div>
+              </div>
+              <div class="quick-amount" onclick="selectAmount(200)">
+                <div class="value">200</div>
+                <div class="label">条</div>
+              </div>
+              <div class="quick-amount" onclick="selectAmount(500)">
+                <div class="value">500</div>
+                <div class="label">条</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="customAmount">自定义数量</label>
+            <input type="number" id="customAmount" placeholder="输入数量" min="1" oninput="clearQuickSelect()">
+          </div>
+          
+          <div class="form-group">
+            <label for="note">备注（选填）</label>
+            <textarea id="note" placeholder="如有其他需求请备注说明" rows="2"></textarea>
+          </div>
+          
+          <button class="btn-recharge" id="rechargeBtn" onclick="submitRecharge()">提交充值申请</button>
+        </div>
+        
+        <!-- 充值记录 -->
+        <div class="records-section">
+          <h3 class="section-title">📋 充值记录</h3>
+          <div class="records-list" id="recordsList">
+            <div class="empty-records">加载中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/api.js"></script>
+  <script>
+    // 检查登录
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/login';
+    }
+    
+    let selectedAmount = 0;
+    
+    // 初始化
+    async function init() {
+      await loadProfile();
+      await loadRecords();
+    }
+    
+    // 加载用户信息
+    async function loadProfile() {
+      try {
+        const data = await api.get('/api/user/profile');
+        if (data.code === 0) {
+          document.getElementById('currentBalance').textContent = data.data.message_count;
+        }
+      } catch (err) {
+        console.error('Load profile error:', err);
+      }
+    }
+    
+    // 加载充值记录
+    async function loadRecords() {
+      try {
+        const data = await api.get('/api/recharge/records');
+        const container = document.getElementById('recordsList');
+        
+        if (data.code === 0 && data.data.length > 0) {
+          container.innerHTML = data.data.map(record => {
+            const time = new Date(record.created_at * 1000).toLocaleString('zh-CN');
+            const statusClass = `status-${record.status}`;
+            const statusText = {
+              pending: '待处理',
+              approved: '已通过',
+              rejected: '已拒绝'
+            }[record.status] || record.status;
+            
+            return `
+              <div class="record-item">
+                <div class="record-info">
+                  <div class="record-amount">+${record.amount} 条</div>
+                  <div class="record-time">${time}</div>
+                  ${record.note ? `<div style="font-size:0.8rem;color:#666;margin-top:0.25rem;">备注: ${escapeHtml(record.note)}</div>` : ''}
+                </div>
+                <span class="record-status ${statusClass}">${statusText}</span>
+              </div>
+            `;
+          }).join('');
+        } else {
+          container.innerHTML = '<div class="empty-records">暂无充值记录</div>';
+        }
+      } catch (err) {
+        console.error('Load records error:', err);
+        document.getElementById('recordsList').innerHTML = '<div class="empty-records">加载失败</div>';
+      }
+    }
+    
+    // 选择快捷金额
+    function selectAmount(amount) {
+      selectedAmount = amount;
+      document.getElementById('customAmount').value = '';
+      
+      document.querySelectorAll('.quick-amount').forEach(el => el.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    }
+    
+    // 清除快捷选择
+    function clearQuickSelect() {
+      selectedAmount = 0;
+      document.querySelectorAll('.quick-amount').forEach(el => el.classList.remove('active'));
+    }
+    
+    // 提交充值申请
+    async function submitRecharge() {
+      const amount = selectedAmount || parseInt(document.getElementById('customAmount').value);
+      const note = document.getElementById('note').value.trim();
+      const btn = document.getElementById('rechargeBtn');
+      const successMsg = document.getElementById('successMsg');
+      
+      if (!amount || amount < 1) {
+        alert('请选择或输入充值数量');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.textContent = '提交中...';
+      successMsg.style.display = 'none';
+      
+      try {
+        const data = await api.post('/api/recharge/apply', { amount, note });
+        
+        if (data.code === 0) {
+          successMsg.textContent = '✅ ' + data.message;
+          successMsg.style.display = 'block';
+          
+          // 清空表单
+          selectedAmount = 0;
+          document.getElementById('customAmount').value = '';
+          document.getElementById('note').value = '';
+          document.querySelectorAll('.quick-amount').forEach(el => el.classList.remove('active'));
+          
+          // 刷新记录
+          await loadRecords();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('提交失败：' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '提交充值申请';
+      }
+    }
+    
+    // HTML 转义
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台 - ClawBot AI</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <style>
+    body {
+      background: #f5f7fa;
+      margin: 0;
+    }
+    
+    .admin-header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: white;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    
+    .admin-header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .admin-brand {
+      font-size: 1.25rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .admin-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .btn-logout-admin {
+      padding: 0.5rem 1rem;
+      background: rgba(255,100,100,0.2);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-logout-admin:hover {
+      background: rgba(255,100,100,0.4);
+    }
+    
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .admin-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      background: white;
+      padding: 0.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .admin-tab {
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #666;
+      transition: all 0.3s ease;
+    }
+    
+    .admin-tab:hover {
+      background: #f0f0f0;
+    }
+    
+    .admin-tab.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* 统计卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .stat-card .icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .stat-card .label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    /* 数据表格 */
+    .data-table-container {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      overflow-x: auto;
+    }
+    
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .table-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .table-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .filter-select {
+      padding: 0.5rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+    
+    .data-table th,
+    .data-table td {
+      padding: 0.875rem;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .data-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+      font-size: 0.9rem;
+    }
+    
+    .data-table tr:hover {
+      background: #f8f9fa;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-active, .status-approved {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-rejected, .status-disabled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .status-rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .btn-action {
+      padding: 0.375rem 0.75rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      margin-right: 0.25rem;
+    }
+    
+    .btn-approve {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .btn-approve:hover {
+      background: #c3e6cb;
+    }
+    
+    .btn-reject {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .btn-reject:hover {
+      background: #f5c6cb;
+    }
+    
+    .btn-edit {
+      background: #cce5ff;
+      color: #004085;
+    }
+    
+    .btn-edit:hover {
+      background: #b8daff;
+    }
+    
+    .btn-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .btn-danger:hover {
+      background: #f5c6cb;
+    }
+    
+    /* 表单样式 */
+    .form-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+    }
+    
+    .form-card h3 {
+      margin: 0 0 1.5rem 0;
+      color: #333;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 500;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .btn-primary {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* 文件上传 */
+    .file-upload-area {
+      border: 2px dashed #ddd;
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .file-upload-area:hover {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .file-upload-area input {
+      display: none;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .pagination button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .pagination button:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+    
+    .pagination button.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* 模态框 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-header h3 {
+      margin: 0;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+    }
+    
+    /* API Key 列表 */
+    .api-key-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+    }
+    
+    .api-key-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .api-key-value {
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #333;
+      word-break: break-all;
+    }
+    
+    .api-key-meta {
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .3s;
+      border-radius: 26px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #667eea;
+    }
+    
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #999;
+    }
+    
+    @media (max-width: 768px) {
+      .admin-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .admin-tab {
+        white-space: nowrap;
+      }
+      
+      .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="admin-header">
+    <div class="admin-header-content">
+      <div class="admin-brand">
+        <span>🔐</span>
+        <span>ClawBot 管理后台</span>
+      </div>
+      <div class="admin-user">
+        <span id="adminUsername">管理员</span>
+        <button class="btn-logout-admin" onclick="logout()">退出</button>
+      </div>
+    </div>
+  </header>
+  
+  <!-- 主容器 -->
+  <div class="admin-container">
+    <!-- 标签页 -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="stats">数据概览</button>
+      <button class="admin-tab" data-tab="users">用户管理</button>
+      <button class="admin-tab" data-tab="recharges">充值管理</button>
+      <button class="admin-tab" data-tab="apikeys">API配置</button>
+      <button class="admin-tab" data-tab="invitelinks">邀请链接</button>
+      <button class="admin-tab" data-tab="announcements">公告管理</button>
+      <button class="admin-tab" data-tab="config">系统配置</button>
+    </div>
+    
+    <!-- 数据概览 -->
+    <div class="tab-content active" id="tab-stats">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="icon">👥</div>
+          <div class="value" id="statTotalUsers">-</div>
+          <div class="label">总用户数</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon">✅</div>
+          <div class="value" id="statActiveUsers">-</div>
+          <div class="label">活跃用户</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon">⏳</div>
+          <div class="value" id="statPendingUsers">-</div>
+          <div class="label">待审核</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon">🤖</div>
+          <div class="value" id="statTotalAgents">-</div>
+          <div class="label">智能体数</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon">💬</div>
+          <div class="value" id="statTotalMessages">-</div>
+          <div class="label">总消息数</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon">💰</div>
+          <div class="value" id="statPendingRecharges">-</div>
+          <div class="label">待处理充值</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon">📅</div>
+          <div class="value" id="statTodayUsers">-</div>
+          <div class="label">今日新增</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 用户管理 -->
+    <div class="tab-content" id="tab-users">
+      <div class="data-table-container">
+        <div class="table-header">
+          <div class="table-title">用户列表</div>
+          <div class="table-actions">
+            <select class="filter-select" id="userStatusFilter" onchange="loadUsers()">
+              <option value="">全部状态</option>
+              <option value="pending">待审核</option>
+              <option value="active">已激活</option>
+              <option value="rejected">已拒绝</option>
+              <option value="disabled">已停用</option>
+            </select>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>用户名</th>
+              <th>状态</th>
+              <th>消息余额</th>
+              <th>注册时间</th>
+              <th>最后登录</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <tr><td colspan="7" class="empty-state">加载中...</td></tr>
+          </tbody>
+        </table>
+        <div class="pagination" id="usersPagination"></div>
+      </div>
+    </div>
+    
+    <!-- 充值管理 -->
+    <div class="tab-content" id="tab-recharges">
+      <div class="data-table-container">
+        <div class="table-header">
+          <div class="table-title">充值记录</div>
+          <div class="table-actions">
+            <select class="filter-select" id="rechargeStatusFilter" onchange="loadRecharges()">
+              <option value="">全部状态</option>
+              <option value="pending">待处理</option>
+              <option value="approved">已通过</option>
+              <option value="rejected">已拒绝</option>
+            </select>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>用户</th>
+              <th>充值数量</th>
+              <th>状态</th>
+              <th>备注</th>
+              <th>申请时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="rechargesTableBody">
+            <tr><td colspan="7" class="empty-state">加载中...</td></tr>
+          </tbody>
+        </table>
+        <div class="pagination" id="rechargesPagination"></div>
+      </div>
+    </div>
+    
+    <!-- API配置 -->
+    <div class="tab-content" id="tab-apikeys">
+      <div class="form-card">
+        <h3>添加单个 API Key</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>API Key</label>
+            <input type="text" id="newApiKey" placeholder="sk-xxxx...">
+          </div>
+          <div class="form-group">
+            <label>API 地址</label>
+            <input type="text" id="newApiUrl" placeholder="https://api.example.com" value="https://api.oiapi.net/aiRuntime">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>备注名称</label>
+            <input type="text" id="newApiName" placeholder="可选备注">
+          </div>
+          <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button class="btn-primary" onclick="addApiKey()">添加</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-card">
+        <h3>批量导入 API Keys</h3>
+        <div class="file-upload-area" onclick="document.getElementById('fileUpload').click()">
+          <input type="file" id="fileUpload" accept=".txt,.json" onchange="handleFileUpload(event)">
+          <p>📁 点击选择文件或拖拽文件到此处</p>
+          <p style="color: #999; font-size: 0.85rem;">支持 .txt（每行一个Key）或 .json 格式</p>
+        </div>
+        <div id="filePreview" style="margin-top: 1rem; display: none;">
+          <pre style="background: #f8f9fa; padding: 1rem; border-radius: 8px; max-height: 200px; overflow-y: auto;"></pre>
+          <button class="btn-primary" style="margin-top: 1rem;" onclick="importApiKeys()">确认导入</button>
+        </div>
+      </div>
+      
+      <div class="form-card">
+        <h3>API Keys 列表</h3>
+        <div id="apiKeysList">
+          <div class="empty-state">加载中...</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 邀请链接 -->
+    <div class="tab-content" id="tab-invitelinks">
+      <div class="form-card">
+        <h3>生成邀请链接</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>选择用户</label>
+            <select id="inviteLinkUser">
+              <option value="">加载中...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>奖励消息数</label>
+            <input type="number" id="inviteLinkReward" value="50" min="1">
+          </div>
+          <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button class="btn-primary" onclick="createInviteLink()">生成</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="data-table-container">
+        <div class="table-header">
+          <div class="table-title">邀请链接列表</div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>邀请码</th>
+              <th>创建者</th>
+              <th>奖励条数</th>
+              <th>已使用</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="inviteLinksTableBody">
+            <tr><td colspan="7" class="empty-state">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- 公告管理 -->
+    <div class="tab-content" id="tab-announcements">
+      <div class="form-card">
+        <h3 id="announcementFormTitle">发布新公告</h3>
+        <div class="form-group">
+          <label>标题</label>
+          <input type="text" id="announcementTitle" placeholder="公告标题">
+        </div>
+        <div class="form-group">
+          <label>内容</label>
+          <textarea id="announcementContent" placeholder="公告内容" rows="4"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>优先级</label>
+            <input type="number" id="announcementPriority" value="0" min="0">
+          </div>
+          <div class="form-group" style="display: flex; align-items: flex-end; gap: 0.5rem;">
+            <button class="btn-primary" id="announcementSubmitBtn" onclick="saveAnnouncement()">发布</button>
+            <button class="btn-action btn-edit" onclick="resetAnnouncementForm()" style="padding: 0.75rem;">取消</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="data-table-container">
+        <div class="table-header">
+          <div class="table-title">公告列表</div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>标题</th>
+              <th>优先级</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="announcementsTableBody">
+            <tr><td colspan="6" class="empty-state">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- 系统配置 -->
+    <div class="tab-content" id="tab-config">
+      <div class="form-card">
+        <h3>全局配置</h3>
+        <div id="configForm">
+          <div class="form-group">
+            <label>默认 AI API 地址</label>
+            <input type="text" id="configDefaultApiUrl" placeholder="https://api.oiapi.net/aiRuntime">
+          </div>
+          <div class="form-group">
+            <label>默认图片 API 地址</label>
+            <input type="text" id="configDefaultImageApiUrl" placeholder="https://api.oiapi.net/image">
+          </div>
+          <div class="form-group">
+            <label>默认图片 API Key</label>
+            <input type="text" id="configDefaultImageApiKey" placeholder="图片API密钥">
+          </div>
+          <div class="form-group">
+            <label>微信机器人 API 地址</label>
+            <input type="text" id="configWechatBotUrl" placeholder="微信机器人API地址">
+          </div>
+          <div class="form-group">
+            <label>微信机器人 API Key</label>
+            <input type="text" id="configWechatBotKey" placeholder="微信机器人API密钥">
+          </div>
+          <div class="form-group">
+            <label>每用户最大记忆数</label>
+            <input type="number" id="configMemoryMaxCount" placeholder="500">
+          </div>
+          <div class="form-group">
+            <label>启用早安推送</label>
+            <select id="configMorningPushEnabled">
+              <option value="false">禁用</option>
+              <option value="true">启用</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="saveConfig()">保存配置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 模态框：设置用户额度 -->
+  <div class="modal" id="setBalanceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>设置用户额度</h3>
+        <button class="modal-close" onclick="closeModal('setBalanceModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>新消息余额</label>
+        <input type="number" id="newBalanceInput" min="0" placeholder="输入新的消息余额">
+      </div>
+      <button class="btn-primary" onclick="setUserBalance()" style="width: 100%;">确认</button>
+    </div>
+  </div>
+
+  <script src="../../js/api.js"></script>
+  <script>
+    // 当前编辑的ID
+    let editingAnnouncementId = null;
+    let editingUserId = null;
+    let pendingImportKeys = [];
+    
+    // 检查登录
+    if (!localStorage.getItem('adminToken')) {
+      window.location.href = '/admin/login';
+    }
+    
+    // 加载管理员信息
+    const admin = JSON.parse(localStorage.getItem('admin') || '{}');
+    document.getElementById('adminUsername').textContent = admin.username || '管理员';
+    
+    // API 基础路径
+    const API_BASE = ''; // 使用相对路径，由 api.js 处理
+    
+    // 标签页切换
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        
+        // 加载对应标签页数据
+        switch (tab.dataset.tab) {
+          case 'stats': loadStats(); break;
+          case 'users': loadUsers(); break;
+          case 'recharges': loadRecharges(); break;
+          case 'apikeys': loadApiKeys(); break;
+          case 'invitelinks': loadInviteLinks(); loadAllUsers(); break;
+          case 'announcements': loadAnnouncements(); break;
+          case 'config': loadConfig(); break;
+        }
+      });
+    });
+    
+    // 加载统计数据
+    async function loadStats() {
+      try {
+        const data = await adminApi.get('/api/admin/stats');
+        if (data.code === 0) {
+          document.getElementById('statTotalUsers').textContent = data.data.total_users;
+          document.getElementById('statActiveUsers').textContent = data.data.active_users;
+          document.getElementById('statPendingUsers').textContent = data.data.pending_users;
+          document.getElementById('statTotalAgents').textContent = data.data.total_agents;
+          document.getElementById('statTotalMessages').textContent = data.data.total_messages;
+          document.getElementById('statPendingRecharges').textContent = data.data.pending_recharges;
+          document.getElementById('statTodayUsers').textContent = data.data.today_users;
+        }
+      } catch (err) {
+        console.error('Load stats error:', err);
+      }
+    }
+    
+    // 加载用户列表
+    async function loadUsers(page = 1) {
+      const status = document.getElementById('userStatusFilter').value;
+      try {
+        const data = await adminApi.get(`/api/admin/users?page=${page}&limit=20${status ? '&status=' + status : ''}`);
+        const tbody = document.getElementById('usersTableBody');
+        
+        if (data.code === 0 && data.data.list.length > 0) {
+          tbody.innerHTML = data.data.list.map(user => {
+            const createdAt = new Date(user.created_at * 1000).toLocaleDateString('zh-CN');
+            const lastLogin = user.last_login_at ? new Date(user.last_login_at * 1000).toLocaleDateString('zh-CN') : '从未';
+            
+            return `
+              <tr>
+                <td>${user.id}</td>
+                <td>${escapeHtml(user.username)}</td>
+                <td><span class="status-badge status-${user.status}">${getStatusText(user.status)}</span></td>
+                <td>${user.message_count}</td>
+                <td>${createdAt}</td>
+                <td>${lastLogin}</td>
+                <td>
+                  ${user.status === 'pending' ? `
+                    <button class="btn-action btn-approve" onclick="updateUser(${user.id}, 'approve')">通过</button>
+                    <button class="btn-action btn-reject" onclick="updateUser(${user.id}, 'reject')">拒绝</button>
+                  ` : ''}
+                  ${user.status === 'active' ? `
+                    <button class="btn-action btn-edit" onclick="openBalanceModal(${user.id})">设额度</button>
+                    <button class="btn-action btn-danger" onclick="updateUser(${user.id}, 'disable')">停用</button>
+                  ` : ''}
+                  ${user.status === 'disabled' ? `
+                    <button class="btn-action btn-approve" onclick="updateUser(${user.id}, 'enable')">启用</button>
+                  ` : ''}
+                  <button class="btn-action btn-danger" onclick="deleteUser(${user.id})">删除</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+          
+          // 分页
+          renderPagination('usersPagination', page, data.data.total, 20, loadUsers);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无用户</td></tr>';
+        }
+      } catch (err) {
+        console.error('Load users error:', err);
+      }
+    }
+    
+    // 更新用户
+    async function updateUser(userId, action) {
+      if (!confirm('确定要执行此操作吗？')) return;
+      
+      try {
+        const data = await adminApi.put(`/api/admin/users/${userId}`, { action });
+        if (data.code === 0) {
+          alert('操作成功');
+          loadUsers();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('操作失败');
+      }
+    }
+    
+    // 删除用户
+    async function deleteUser(userId) {
+      if (!confirm('确定要删除此用户吗？此操作不可恢复！')) return;
+      
+      try {
+        const data = await adminApi.delete(`/api/admin/users/${userId}`);
+        if (data.code === 0) {
+          alert('删除成功');
+          loadUsers();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('删除失败');
+      }
+    }
+    
+    // 打开额度设置模态框
+    function openBalanceModal(userId) {
+      editingUserId = userId;
+      document.getElementById('newBalanceInput').value = '';
+      document.getElementById('setBalanceModal').classList.add('active');
+    }
+    
+    // 设置用户额度
+    async function setUserBalance() {
+      const newBalance = parseInt(document.getElementById('newBalanceInput').value);
+      
+      if (isNaN(newBalance) || newBalance < 0) {
+        alert('请输入有效的数量');
+        return;
+      }
+      
+      try {
+        const data = await adminApi.put(`/api/admin/users/${editingUserId}`, { message_count: newBalance });
+        if (data.code === 0) {
+          alert('设置成功');
+          closeModal('setBalanceModal');
+          loadUsers();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('设置失败');
+      }
+    }
+    
+    // 加载充值列表
+    async function loadRecharges(page = 1) {
+      const status = document.getElementById('rechargeStatusFilter').value;
+      try {
+        const data = await adminApi.get(`/api/admin/recharges?page=${page}&limit=20${status ? '&status=' + status : ''}`);
+        const tbody = document.getElementById('rechargesTableBody');
+        
+        if (data.code === 0 && data.data.list.length > 0) {
+          tbody.innerHTML = data.data.list.map(record => {
+            const createdAt = new Date(record.created_at * 1000).toLocaleString('zh-CN');
+            
+            return `
+              <tr>
+                <td>${record.id}</td>
+                <td>${escapeHtml(record.username || '用户' + record.user_id)}</td>
+                <td><strong>${record.amount}</strong> 条</td>
+                <td><span class="status-badge status-${record.status}">${getStatusText(record.status)}</span></td>
+                <td>${escapeHtml(record.note || '-')}</td>
+                <td>${createdAt}</td>
+                <td>
+                  ${record.status === 'pending' ? `
+                    <button class="btn-action btn-approve" onclick="processRecharge(${record.id}, 'approve')">通过</button>
+                    <button class="btn-action btn-reject" onclick="processRecharge(${record.id}, 'reject')">拒绝</button>
+                  ` : '-'}
+                </td>
+              </tr>
+            `;
+          }).join('');
+          
+          renderPagination('rechargesPagination', page, data.data.total, 20, loadRecharges);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无充值记录</td></tr>';
+        }
+      } catch (err) {
+        console.error('Load recharges error:', err);
+      }
+    }
+    
+    // 处理充值
+    async function processRecharge(rechargeId, action) {
+      if (!confirm('确定要' + (action === 'approve' ? '通过' : '拒绝') + '此充值申请吗？')) return;
+      
+      try {
+        const data = await adminApi.put(`/api/admin/recharges/${rechargeId}`, { action });
+        if (data.code === 0) {
+          alert('处理成功');
+          loadRecharges();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('处理失败');
+      }
+    }
+    
+    // 加载 API Keys
+    async function loadApiKeys() {
+      try {
+        const data = await adminApi.get('/api/admin/api-keys');
+        const container = document.getElementById('apiKeysList');
+        
+        if (data.code === 0 && data.data.length > 0) {
+          container.innerHTML = data.data.map(key => `
+            <div class="api-key-item">
+              <div class="api-key-info">
+                <div class="api-key-value">${escapeHtml(key.api_key)}</div>
+                <div class="api-key-meta">
+                  ${escapeHtml(key.name || '无备注')} | 
+                  使用 ${key.use_count} 次 | 
+                  ${key.api_url}
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <label class="toggle-switch">
+                  <input type="checkbox" ${key.status === 'active' ? 'checked' : ''} onchange="toggleApiKey(${key.id}, this.checked)">
+                  <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-action btn-danger" onclick="deleteApiKey(${key.id})">删除</button>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<div class="empty-state">暂无 API Keys</div>';
+        }
+      } catch (err) {
+        console.error('Load api keys error:', err);
+      }
+    }
+    
+    // 添加 API Key
+    async function addApiKey() {
+      const apiKey = document.getElementById('newApiKey').value.trim();
+      const apiUrl = document.getElementById('newApiUrl').value.trim();
+      const name = document.getElementById('newApiName').value.trim();
+      
+      if (!apiKey) {
+        alert('请输入 API Key');
+        return;
+      }
+      
+      try {
+        const data = await adminApi.post('/api/admin/api-keys', { api_key: apiKey, api_url: apiUrl, name });
+        if (data.code === 0) {
+          alert('添加成功');
+          document.getElementById('newApiKey').value = '';
+          document.getElementById('newApiName').value = '';
+          loadApiKeys();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('添加失败');
+      }
+    }
+    
+    // 切换 API Key 状态
+    async function toggleApiKey(keyId, enabled) {
+      try {
+        await adminApi.put(`/api/admin/api-keys/${keyId}`, { status: enabled ? 'active' : 'disabled' });
+      } catch (err) {
+        console.error('Toggle api key error:', err);
+      }
+    }
+    
+    // 删除 API Key
+    async function deleteApiKey(keyId) {
+      if (!confirm('确定要删除此 API Key 吗？')) return;
+      
+      try {
+        const data = await adminApi.delete(`/api/admin/api-keys/${keyId}`);
+        if (data.code === 0) {
+          alert('删除成功');
+          loadApiKeys();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('删除失败');
+      }
+    }
+    
+    // 处理文件上传
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        const preview = document.getElementById('filePreview');
+        const pre = preview.querySelector('pre');
+        
+        try {
+          if (file.name.endsWith('.json')) {
+            pendingImportKeys = JSON.parse(content);
+          } else {
+            // TXT 格式，每行一个 Key
+            pendingImportKeys = content.split('\n')
+              .filter(line => line.trim())
+              .map(key => ({ key: key.trim(), url: 'https://api.oiapi.net/aiRuntime' }));
+          }
+          
+          pre.textContent = JSON.stringify(pendingImportKeys.slice(0, 10), null, 2);
+          if (pendingImportKeys.length > 10) {
+            pre.textContent += `\n\n... 还有 ${pendingImportKeys.length - 10} 个`;
+          }
+          preview.style.display = 'block';
+        } catch (err) {
+          alert('文件格式错误：' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    // 批量导入 API Keys
+    async function importApiKeys() {
+      if (!pendingImportKeys.length) {
+        alert('请先选择文件');
+        return;
+      }
+      
+      try {
+        const data = await adminApi.post('/api/admin/api-keys/import', { keys: pendingImportKeys });
+        if (data.code === 0) {
+          alert(data.message);
+          document.getElementById('filePreview').style.display = 'none';
+          document.getElementById('fileUpload').value = '';
+          pendingImportKeys = [];
+          loadApiKeys();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('导入失败');
+      }
+    }
+    
+    // 加载所有用户（用于邀请链接）
+    async function loadAllUsers() {
+      try {
+        const data = await adminApi.get('/api/admin/all-users');
+        const select = document.getElementById('inviteLinkUser');
+        
+        if (data.code === 0 && data.data.length > 0) {
+          select.innerHTML = data.data.map(user => 
+            `<option value="${user.id}">${escapeHtml(user.username)}</option>`
+          ).join('');
+        } else {
+          select.innerHTML = '<option value="">暂无用户</option>';
+        }
+      } catch (err) {
+        console.error('Load all users error:', err);
+      }
+    }
+    
+    // 加载邀请链接
+    async function loadInviteLinks() {
+      try {
+        const data = await adminApi.get('/api/admin/invite-links');
+        const tbody = document.getElementById('inviteLinksTableBody');
+        
+        if (data.code === 0 && data.data.length > 0) {
+          tbody.innerHTML = data.data.map(link => {
+            const createdAt = new Date(link.created_at * 1000).toLocaleDateString('zh-CN');
+            
+            return `
+              <tr>
+                <td><code>${link.code}</code></td>
+                <td>${escapeHtml(link.creator_name || '用户' + link.creator_id)}</td>
+                <td>${link.reward_messages} 条</td>
+                <td>${link.used_count} 次</td>
+                <td><span class="status-badge status-${link.status}">${link.status === 'active' ? '启用' : '禁用'}</span></td>
+                <td>${createdAt}</td>
+                <td>
+                  <button class="btn-action btn-danger" onclick="deleteInviteLink(${link.id})">删除</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无邀请链接</td></tr>';
+        }
+      } catch (err) {
+        console.error('Load invite links error:', err);
+      }
+    }
+    
+    // 创建邀请链接
+    async function createInviteLink() {
+      const userId = document.getElementById('inviteLinkUser').value;
+      const reward = parseInt(document.getElementById('inviteLinkReward').value) || 50;
+      
+      if (!userId) {
+        alert('请选择用户');
+        return;
+      }
+      
+      try {
+        const data = await adminApi.post('/api/admin/invite-links', { 
+          creator_id: parseInt(userId), 
+          reward_messages: reward 
+        });
+        
+        if (data.code === 0) {
+          alert(`邀请链接创建成功！\n邀请码：${data.data.code}\n奖励：${data.data.reward} 条消息`);
+          loadInviteLinks();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('创建失败');
+      }
+    }
+    
+    // 删除邀请链接
+    async function deleteInviteLink(linkId) {
+      if (!confirm('确定要删除此邀请链接吗？')) return;
+      
+      try {
+        const data = await adminApi.delete(`/api/admin/invite-links/${linkId}`);
+        if (data.code === 0) {
+          alert('删除成功');
+          loadInviteLinks();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('删除失败');
+      }
+    }
+    
+    // 加载公告
+    async function loadAnnouncements() {
+      try {
+        const data = await adminApi.get('/api/admin/announcements');
+        const tbody = document.getElementById('announcementsTableBody');
+        
+        if (data.code === 0 && data.data.length > 0) {
+          tbody.innerHTML = data.data.map(ann => {
+            const createdAt = new Date(ann.created_at * 1000).toLocaleDateString('zh-CN');
+            
+            return `
+              <tr>
+                <td>${ann.id}</td>
+                <td>${escapeHtml(ann.title)}</td>
+                <td>${ann.priority}</td>
+                <td><span class="status-badge status-${ann.status === 'active' ? 'active' : 'disabled'}">${ann.status === 'active' ? '显示' : '隐藏'}</span></td>
+                <td>${createdAt}</td>
+                <td>
+                  <button class="btn-action btn-edit" onclick="editAnnouncement(${ann.id})">编辑</button>
+                  <button class="btn-action btn-danger" onclick="deleteAnnouncement(${ann.id})">删除</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无公告</td></tr>';
+        }
+      } catch (err) {
+        console.error('Load announcements error:', err);
+      }
+    }
+    
+    // 保存公告
+    async function saveAnnouncement() {
+      const title = document.getElementById('announcementTitle').value.trim();
+      const content = document.getElementById('announcementContent').value.trim();
+      const priority = parseInt(document.getElementById('announcementPriority').value) || 0;
+      
+      if (!title || !content) {
+        alert('标题和内容不能为空');
+        return;
+      }
+      
+      try {
+        let data;
+        if (editingAnnouncementId) {
+          data = await adminApi.put(`/api/admin/announcements/${editingAnnouncementId}`, { title, content, priority });
+        } else {
+          data = await adminApi.post('/api/admin/announcements', { title, content, priority });
+        }
+        
+        if (data.code === 0) {
+          alert(editingAnnouncementId ? '更新成功' : '发布成功');
+          resetAnnouncementForm();
+          loadAnnouncements();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('保存失败');
+      }
+    }
+    
+    // 编辑公告
+    async function editAnnouncement(id) {
+      try {
+        const data = await adminApi.get('/api/admin/announcements');
+        if (data.code === 0) {
+          const ann = data.data.find(a => a.id === id);
+          if (ann) {
+            editingAnnouncementId = id;
+            document.getElementById('announcementFormTitle').textContent = '编辑公告';
+            document.getElementById('announcementTitle').value = ann.title;
+            document.getElementById('announcementContent').value = ann.content;
+            document.getElementById('announcementPriority').value = ann.priority;
+          }
+        }
+      } catch (err) {
+        console.error('Edit announcement error:', err);
+      }
+    }
+    
+    // 重置公告表单
+    function resetAnnouncementForm() {
+      editingAnnouncementId = null;
+      document.getElementById('announcementFormTitle').textContent = '发布新公告';
+      document.getElementById('announcementTitle').value = '';
+      document.getElementById('announcementContent').value = '';
+      document.getElementById('announcementPriority').value = '0';
+    }
+    
+    // 删除公告
+    async function deleteAnnouncement(id) {
+      if (!confirm('确定要删除此公告吗？')) return;
+      
+      try {
+        const data = await adminApi.delete(`/api/admin/announcements/${id}`);
+        if (data.code === 0) {
+          alert('删除成功');
+          loadAnnouncements();
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        alert('删除失败');
+      }
+    }
+    
+    // 加载配置
+    async function loadConfig() {
+      try {
+        const data = await adminApi.get('/api/admin/config');
+        if (data.code === 0) {
+          const config = {};
+          data.data.forEach(item => {
+            config[item.key] = item.value;
+          });
+          
+          document.getElementById('configDefaultApiUrl').value = config.default_api_url || '';
+          document.getElementById('configDefaultImageApiUrl').value = config.default_image_api_url || '';
+          document.getElementById('configDefaultImageApiKey').value = config.default_image_api_key || '';
+          document.getElementById('configWechatBotUrl').value = config.wechat_bot_url || '';
+          document.getElementById('configWechatBotKey').value = config.wechat_bot_key || '';
+          document.getElementById('configMemoryMaxCount').value = config.memory_max_count || '500';
+          document.getElementById('configMorningPushEnabled').value = config.morning_push_enabled || 'false';
+        }
+      } catch (err) {
+        console.error('Load config error:', err);
+      }
+    }
+    
+    // 保存配置
+    async function saveConfig() {
+      const configs = [
+        { key: 'default_api_url', value: document.getElementById('configDefaultApiUrl').value },
+        { key: 'default_image_api_url', value: document.getElementById('configDefaultImageApiUrl').value },
+        { key: 'default_image_api_key', value: document.getElementById('configDefaultImageApiKey').value },
+        { key: 'wechat_bot_url', value: document.getElementById('configWechatBotUrl').value },
+        { key: 'wechat_bot_key', value: document.getElementById('configWechatBotKey').value },
+        { key: 'memory_max_count', value: document.getElementById('configMemoryMaxCount').value },
+        { key: 'morning_push_enabled', value: document.getElementById('configMorningPushEnabled').value }
+      ];
+      
+      try {
+        for (const config of configs) {
+          await adminApi.put('/api/admin/config', config);
+        }
+        alert('配置保存成功');
+      } catch (err) {
+        alert('保存失败');
+      }
+    }
+    
+    // 关闭模态框
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+    
+    // 分页渲染
+    function renderPagination(containerId, current, total, limit, callback) {
+      const totalPages = Math.ceil(total / limit);
+      const container = document.getElementById(containerId);
+      
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+      
+      let html = '';
+      html += `<button ${current === 1 ? 'disabled' : ''} onclick="${callback.name}(${current - 1})">上一页</button>`;
+      
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= current - 2 && i <= current + 2)) {
+          html += `<button class="${i === current ? 'active' : ''}" onclick="${callback.name}(${i})">${i}</button>`;
+        } else if (i === current - 3 || i === current + 3) {
+          html += '<button disabled>...</button>';
+        }
+      }
+      
+      html += `<button ${current === totalPages ? 'disabled' : ''} onclick="${callback.name}(${current + 1})">下一页</button>`;
+      
+      container.innerHTML = html;
+    }
+    
+    // 状态文本
+    function getStatusText(status) {
+      const map = {
+        pending: '待审核',
+        active: '已激活',
+        rejected: '已拒绝',
+        disabled: '已停用',
+        approved: '已通过'
+      };
+      return map[status] || status;
+    }
+    
+    // HTML 转义
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // 退出登录
+    function logout() {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('admin');
+      window.location.href = '/admin/login';
+    }
+    
+    // 初始化
+    loadStats();
+  </script>
+</body>
+</html>

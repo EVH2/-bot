@@ -1,0 +1,20 @@
+{
+  "name": "clawbot-saas",
+  "version": "1.0.0",
+  "description": "ClawBot AI Role-Playing Platform on Cloudflare Workers",
+  "main": "worker.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute clawbot-db --local --file=./schema.sql",
+    "db:init-remote": "wrangler d1 execute clawbot-db --remote --file=./schema.sql"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "@hono/node-server": "^1.8.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

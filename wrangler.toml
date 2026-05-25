@@ -1,0 +1,46 @@
+# ClawBot SaaS Platform - Wrangler Configuration
+name = "clawbot-saas"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# D1 数据库绑定
+[[d1_databases]]
+binding = "DB"
+database_name = "clawbot-db"
+database_id = "${CLOUDFLARE_D1_DATABASE_ID}"  # 替换为实际的 D1 数据库 ID
+
+# KV 命名空间（可选，用于缓存）
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "${CLOUDFLARE_KV_NAMESPACE_ID}"
+
+# 环境变量
+[vars]
+# JWT 密钥（生产环境必须设置）
+JWT_SECRET = "your-super-secret-jwt-key-change-in-production"
+# 平台名称
+PLATFORM_NAME = "ClawBot AI"
+# 默认奖励消息数
+DEFAULT_REWARD_MESSAGES = "50"
+
+# 定时触发器 - 每天 8:00 UTC 执行早安推送
+[triggers]
+crons = ["0 8 * * *"]
+
+# 生产环境配置
+[env.production]
+name = "clawbot-saas"
+vars = {
+  JWT_SECRET = "${JWT_SECRET}",
+  PLATFORM_NAME = "ClawBot AI"
+}
+
+# 开发环境配置
+[env.dev]
+name = "clawbot-saas-dev"
+vars = {
+  JWT_SECRET = "dev-secret-key-not-for-production"
+}
+
+# Pages 配置
+pages_build_output_dir = "./frontend"
