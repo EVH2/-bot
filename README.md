@@ -17,7 +17,7 @@ ClawBot_SaaS平台_CF/
     ├── login.html      # 登录页
     ├── dashboard.html  # 用户控制台
     ├── create_agent.html  # 创建/编辑智能体
-    ├── invite.html     # 邀请页面
+    ├── invite.html     # 邀请页面 
     ├── recharge.html   # 充值页面
     ├── admin/
     │   ├── login.html  # 管理员登录
