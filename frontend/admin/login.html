@@ -3,96 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>管理员登录 - ClawBot AI</title>
-  <link rel="stylesheet" href="../../css/style.css">
+  <title>管理员登录 - 小灵唠微信AI</title>
   <style>
-    .auth-container {
-      min-height: 100vh;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: url('https://cdn.phototourl.com/free/2026-05-25-1338b2c9-de7f-411f-bbbd-b0bd84954c58.png') no-repeat center center fixed;
+      background-size: cover;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: system-ui;
+    }
+    .login-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 32px;
       padding: 2rem;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    }
-    
-    .auth-card {
-      background: white;
-      padding: 3rem;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
+      box-shadow: 0 20px 35px -10px rgba(0,0,0,0.25);
     }
-    
-    .auth-header {
-      text-align: center;
-      margin-bottom: 2rem;
+    h2 { text-align: center; color: #1f2b48; margin-bottom: 1.5rem; }
+    .input-group { margin-bottom: 1rem; }
+    label { display: block; margin-bottom: 0.3rem; color: #1f2b48; }
+    input { width: 100%; padding: 0.7rem; border: 1px solid #ccc; border-radius: 20px; }
+    button { width: 100%; padding: 0.7rem; background: #1f2b48; color: white; border: none; border-radius: 40px; cursor: pointer; margin-top: 1rem; }
+    .error { color: red; text-align: center; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+<div class="login-card">
+  <h2>小灵唠微信AI · 管理员</h2>
+  <form id="adminLoginForm">
+    <div class="input-group">
+      <label>用户名</label>
+      <input type="text" id="username" placeholder="管理员用户名" required>
+    </div>
+    <div class="input-group">
+      <label>密码</label>
+      <input type="password" id="password" placeholder="密码" required>
+    </div>
+    <button type="submit">登录</button>
+    <div id="errorMsg" class="error"></div>
+  </form>
+</div>
+
+<script>
+  // 直接内嵌 API 调用，无需外部文件
+  const API_BASE_URL = 'https://delicate-firefly-23d6.2824387178.workers.dev'; // 请确认你的 Worker 域名
+
+  document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const errorDiv = document.getElementById('errorMsg');
+
+    try {
+      const response = await fetch(API_BASE_URL + '/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await response.json();
+
+      if (data.code === 0 && data.data.token) {
+        localStorage.setItem('adminToken', data.data.token);
+        localStorage.setItem('admin', JSON.stringify(data.data.admin));
+        window.location.href = '/admin/dashboard';
+      } else {
+        errorDiv.innerText = data.message || '登录失败';
+      }
+    } catch (err) {
+      errorDiv.innerText = '网络错误：' + err.message;
     }
-    
-    .auth-header h1 {
-      font-size: 2rem;
-      color: #333;
-      margin-bottom: 0.5rem;
-    }
-    
-    .auth-header p {
-      color: #666;
-    }
-    
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #555;
-      font-weight: 500;
-    }
-    
-    .form-group input {
-      width: 100%;
-      padding: 0.875rem 1rem;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-    }
-    
-    .form-group input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-    
-    .btn-auth {
-      width: 100%;
-      padding: 1rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .btn-auth:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-    }
-    
-    .btn-auth:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
-    }
-    
-    .auth-footer {
-      text-align: center;
-      margin-top: 1.5rem;
+  });
+</script>
+</body>
+</html>      margin-top: 1.5rem;
       color: #666;
     }
     
