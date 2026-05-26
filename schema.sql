@@ -1,16 +1,19 @@
--- ClawBot AI 平台 D1 数据库初始化脚本
+-- ClawBot AI 平台 D1 数据库初始化脚本（完整版）
 -- 使用 INTEGER 存储时间戳（strftime('%s','now')）
 
--- 用户表
+-- 用户表（已添加微信ID、最后聊天时间、随机消息日期）
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,  -- SHA-256 + salt
     email TEXT,
+    wechat_id TEXT,               -- 微信ID，用于消息推送
     status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'active', 'rejected', 'disabled')),
     message_count INTEGER DEFAULT 0,  -- 可用消息数
-    invite_code TEXT UNIQUE,  -- 用户专属邀请码
-    invited_by INTEGER,  -- 邀请人用户ID
+    invite_code TEXT UNIQUE,      -- 用户专属邀请码
+    invited_by INTEGER,           -- 邀请人用户ID
+    last_chat_at INTEGER DEFAULT 0,        -- 最后一次聊天时间戳（毫秒）
+    last_random_msg_date TEXT DEFAULT '', -- 最后一次收到随机消息的日期（YYYY-MM-DD）
     created_at INTEGER DEFAULT (strftime('%s', 'now')),
     updated_at INTEGER DEFAULT (strftime('%s', 'now')),
     last_login_at INTEGER,
@@ -160,7 +163,7 @@ CREATE INDEX IF NOT EXISTS idx_invite_links_code ON invite_links(code);
 -- 默认密码: admin123 (建议首次登录后立即修改)
 -- 密码哈希: SHA-256("admin123" + "clawbot_salt") = 请在部署后通过注册接口创建或手动更新
 INSERT OR IGNORE INTO admins (id, username, password_hash, role) 
-VALUES (1, 'admin', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'superadmin');
+VALUES (1,  'EVAH2', 'ed0c9d2b5a4f1e8c3d7a9b6f0e2c4d8a1b3c5e7f9a2b4c6d8e0f1a2b3c4d5e6f', 'superadmin');
 
 -- 插入默认配置
 INSERT OR IGNORE INTO config (key, value, description) VALUES 
