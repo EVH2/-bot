@@ -1,18 +1,15 @@
-name = "clawbot-api"
+name = "delicate-firefly-23d6"
 main = "worker.js"
 compatibility_date = "2024-11-22"
 
-# D1 数据库绑定（必须，否则 Worker 无法访问数据库）
 [[d1_databases]]
 binding = "DB"
 database_name = "clawbot-db"
-database_id = "你的实际数据库ID"   # 请替换成真实的 ID
+database_id = "你的实际数据库ID"
 
-# 环境变量（必须，否则 JWT_SECRET 等缺失）
 [vars]
 JWT_SECRET = "your-super-secret-key"
 PLATFORM_NAME = "ClawBot AI"
 
-# 定时触发器（如果需要早安晚安等功能，必须保留）
 [triggers]
-crons = ["0 8 * * *", "0 12 * * *", "0 22 * * *"]
+crons = ["0 8 * * *"]
