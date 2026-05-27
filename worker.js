@@ -777,48 +777,222 @@ async function scheduledTask(event, env, ctx) {
   } catch (err) { console.error('定时任务错误:', err); }
 }
 
-// ==================== 初始化/修复端点（仅首次调用） ====================
+// ==================== 初始化/修复端点 ====================
+// 自动创建所有表 + 插入管理员，访问一次即可
 app.get('/api/admin/setup', async (c) => {
-  try {
-    const results = [];
-    
-    // 1. 检查并创建 admins 表
-    const tableCheck = await c.env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='admins'").first();
-    if (!tableCheck) {
-      results.push('admins 表不存在，请先执行 schema.sql');
-      return c.json({ code: -1, message: '数据库未初始化', results });
-    }
-    
-    // 2. 插入管理员（如果不存在）
-    const adminHash = await sha256('liyuannb666' + 'clawbot_salt');
-    const existing = await c.env.DB.prepare("SELECT id FROM admins WHERE username = 'EVaH2'").first();
-    if (!existing) {
-      await c.env.DB.prepare("INSERT INTO admins (username, password_hash, role) VALUES ('EVaH2', ?, 'superadmin')").bind(adminHash).run();
-      results.push('管理员 EVaH2 已创建');
-    } else {
-      // 更新密码
-      await c.env.DB.prepare("UPDATE admins SET password_hash = ? WHERE username = 'EVaH2'").bind(adminHash).run();
-      results.push('管理员 EVaH2 密码已更新');
-    }
-    
-    // 3. 插入默认配置
-    const configs = [
-      ['default_api_url', 'https://api.oiapi.net/aiRuntime', '默认AI API地址'],
-      ['memory_max_count', '500', '每个用户/智能体最大记忆数']
-    ];
-    for (const [key, val, desc] of configs) {
-      await c.env.DB.prepare('INSERT OR IGNORE INTO config (key, value, description) VALUES (?, ?, ?)').bind(key, val, desc).run();
-    }
-    results.push('默认配置已初始化');
-    
-    // 4. 验证
-    const adminCheck = await c.env.DB.prepare("SELECT id, username, role FROM admins WHERE username = 'EVaH2'").first();
-    results.push(`管理员状态: ${JSON.stringify(adminCheck)}`);
-    
-    return c.json({ code: 0, message: '初始化成功', data: { results } });
-  } catch (err) {
-    return c.json({ code: -1, message: '初始化失败: ' + err.message, error: err.stack });
-  }
+try {
+const results = [];
+const errors = [];
+
+// 完整建表 SQL（与 schema.sql 一致）
+const createTablesSQL = [
+`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    email TEXT,
+    wechat_id TEXT,
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'active', 'rejected', 'disabled')),
+    message_count INTEGER DEFAULT 0,
+    invite_code TEXT UNIQUE,
+    invited_by INTEGER,
+    last_chat_at INTEGER DEFAULT 0,
+    last_random_msg_date TEXT DEFAULT '',
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    updated_at INTEGER DEFAULT (strftime('%s', 'now')),
+    last_login_at INTEGER,
+    FOREIGN KEY (invited_by) REFERENCES users(id)
+)`,
+`CREATE TABLE IF NOT EXISTS agents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    gender TEXT DEFAULT '女',
+    persona TEXT DEFAULT '',
+    background TEXT DEFAULT '',
+    inner_thought TEXT DEFAULT '',
+    actions TEXT DEFAULT '',
+    speaking_style TEXT DEFAULT '',
+    rules TEXT DEFAULT '',
+    custom_prompt TEXT DEFAULT '',
+    prefer_short INTEGER DEFAULT 1,
+    continuous_send INTEGER DEFAULT 0,
+    api_key TEXT,
+    status TEXT DEFAULT 'active' CHECK(status IN ('active', 'disabled')),
+    message_count INTEGER DEFAULT 0,
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    updated_at INTEGER DEFAULT (strftime('%s', 'now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)`,
+`CREATE TABLE IF NOT EXISTS conversations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
+    content TEXT NOT NULL,
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+)`,
+`CREATE TABLE IF NOT EXISTS long_term_memories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    agent_id INTEGER NOT NULL,
+    memory_type TEXT NOT NULL CHECK(memory_type IN ('preference', 'fact', 'habit', 'conflict')),
+    content TEXT NOT NULL,
+    confidence REAL DEFAULT 0.5,
+    source TEXT DEFAULT '',
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    updated_at INTEGER DEFAULT (strftime('%s', 'now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE
+)`,
+`CREATE TABLE IF NOT EXISTS recharge_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    amount INTEGER NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
+    admin_id INTEGER,
+    note TEXT DEFAULT '',
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    processed_at INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (admin_id) REFERENCES users(id)
+)`,
+`CREATE TABLE IF NOT EXISTS invite_links (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT UNIQUE NOT NULL,
+    creator_id INTEGER NOT NULL,
+    used_count INTEGER DEFAULT 0,
+    reward_messages INTEGER DEFAULT 50,
+    status TEXT DEFAULT 'active' CHECK(status IN ('active', 'disabled')),
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    expires_at INTEGER,
+    FOREIGN KEY (creator_id) REFERENCES users(id)
+)`,
+`CREATE TABLE IF NOT EXISTS announcements (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    priority INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'active' CHECK(status IN ('active', 'hidden')),
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    updated_at INTEGER DEFAULT (strftime('%s', 'now'))
+)`,
+`CREATE TABLE IF NOT EXISTS config (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    updated_at INTEGER DEFAULT (strftime('%s', 'now'))
+)`,
+`CREATE TABLE IF NOT EXISTS api_keys (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    api_key TEXT UNIQUE NOT NULL,
+    api_url TEXT NOT NULL DEFAULT 'https://api.oiapi.net/aiRuntime',
+    name TEXT DEFAULT '',
+    status TEXT DEFAULT 'active' CHECK(status IN ('active', 'disabled')),
+    use_count INTEGER DEFAULT 0,
+    last_used_at INTEGER,
+    created_at INTEGER DEFAULT (strftime('%s', 'now'))
+)`,
+`CREATE TABLE IF NOT EXISTS admins (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT DEFAULT 'admin' CHECK(role IN ('admin', 'superadmin')),
+    created_at INTEGER DEFAULT (strftime('%s', 'now'))
+)`,
+`CREATE TABLE IF NOT EXISTS admin_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    admin_id INTEGER NOT NULL,
+    action TEXT NOT NULL,
+    target_type TEXT,
+    target_id INTEGER,
+    detail TEXT DEFAULT '',
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    FOREIGN KEY (admin_id) REFERENCES admins(id)
+)`
+];
+
+// 创建索引 SQL
+const createIndexesSQL = [
+'CREATE INDEX IF NOT EXISTS idx_users_status ON users(status)',
+'CREATE INDEX IF NOT EXISTS idx_users_invite_code ON users(invite_code)',
+'CREATE INDEX IF NOT EXISTS idx_agents_user_id ON agents(user_id)',
+'CREATE INDEX IF NOT EXISTS idx_conversations_agent_user ON conversations(agent_id, user_id, created_at)',
+'CREATE INDEX IF NOT EXISTS idx_memories_user_agent ON long_term_memories(user_id, agent_id)',
+'CREATE INDEX IF NOT EXISTS idx_recharge_user ON recharge_records(user_id, created_at)',
+'CREATE INDEX IF NOT EXISTS idx_invite_links_code ON invite_links(code)'
+];
+
+// 执行建表
+for (const sql of createTablesSQL) {
+try {
+await c.env.DB.prepare(sql).run();
+results.push('✅ 表创建成功');
+} catch (e) {
+errors.push('建表失败: ' + e.message);
+}
+}
+
+// 执行建索引
+for (const sql of createIndexesSQL) {
+try {
+await c.env.DB.prepare(sql).run();
+} catch (e) {
+// 忽略索引错误
+}
+}
+
+// 插入管理员
+const adminHash = await sha256('liyuannb666' + 'clawbot_salt');
+try {
+const existing = await c.env.DB.prepare("SELECT id FROM admins WHERE username = 'EVaH2'").first();
+if (!existing) {
+await c.env.DB.prepare("INSERT INTO admins (username, password_hash, role) VALUES ('EVaH2', ?, 'superadmin')").bind(adminHash).run();
+results.push('✅ 管理员 EVaH2 已创建');
+} else {
+await c.env.DB.prepare("UPDATE admins SET password_hash = ? WHERE username = 'EVaH2'").bind(adminHash).run();
+results.push('✅ 管理员 EVaH2 密码已更新');
+}
+} catch (e) {
+errors.push('管理员操作失败: ' + e.message);
+}
+
+// 插入默认配置
+const defaultConfigs = [
+['default_api_url', 'https://api.oiapi.net/aiRuntime', '默认AI API地址'],
+['default_image_api_url', 'https://api.oiapi.net/image', '默认图片API地址'],
+['default_image_api_key', '', '默认图片API密钥'],
+['wechat_bot_url', '', '微信机器人API地址'],
+['wechat_bot_key', '', '微信机器人API密钥'],
+['memory_max_count', '500', '每个用户/智能体最大记忆数'],
+['morning_push_enabled', 'false', '是否启用早安推送'],
+['morning_push_time', '08:00', '早安推送时间(UTC)']
+];
+for (const [key, val, desc] of defaultConfigs) {
+try {
+await c.env.DB.prepare('INSERT OR IGNORE INTO config (key, value, description) VALUES (?, ?, ?)').bind(key, val, desc).run();
+} catch (e) {}
+}
+results.push('✅ 默认配置已初始化');
+
+// 验证管理员
+try {
+const adminCheck = await c.env.DB.prepare("SELECT id, username, role FROM admins WHERE username = 'EVaH2'").first();
+results.push(`管理员状态: ${JSON.stringify(adminCheck)}`);
+} catch (e) {
+errors.push('验证失败: ' + e.message);
+}
+
+return c.json({
+code: errors.length > 0 ? -1 : 0,
+message: errors.length > 0 ? '部分失败' : '初始化成功',
+data: { results, errors, summary: `✅ 成功: ${results.length} | ❌ 失败: ${errors.length}` }
+});
+} catch (err) {
+return c.json({ code: -1, message: '初始化失败: ' + err.message, error: err.stack });
+}
 });
 app.notFound((c) => c.json({ code: 404, message: 'Not Found' }, 404));
 app.onError((c, err) => { console.error(err); return c.json({ code: 500, message: '服务器错误' }, 500); });

@@ -1,4 +1,2 @@
-# Cloudflare Pages Routes
-# 将 /api/* 请求代理到 Worker
-/api/*  https://delicate-firefly-23d6.2824387178.workers.dev/api/:splat  200
-/admin/api/*  https://delicate-firefly-23d6.2824387178.workers.dev/admin/api/:splat  200
+# Cloudflare Pages Routes - 代理 /api/* 到 Worker
+/api/*  /api/:splat  200
