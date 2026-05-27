@@ -777,7 +777,49 @@ async function scheduledTask(event, env, ctx) {
   } catch (err) { console.error('定时任务错误:', err); }
 }
 
-// ==================== 错误处理 ====================
+// ==================== 初始化/修复端点（仅首次调用） ====================
+app.get('/api/admin/setup', async (c) => {
+  try {
+    const results = [];
+    
+    // 1. 检查并创建 admins 表
+    const tableCheck = await c.env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='admins'").first();
+    if (!tableCheck) {
+      results.push('admins 表不存在，请先执行 schema.sql');
+      return c.json({ code: -1, message: '数据库未初始化', results });
+    }
+    
+    // 2. 插入管理员（如果不存在）
+    const adminHash = await sha256('liyuannb666' + 'clawbot_salt');
+    const existing = await c.env.DB.prepare("SELECT id FROM admins WHERE username = 'EVaH2'").first();
+    if (!existing) {
+      await c.env.DB.prepare("INSERT INTO admins (username, password_hash, role) VALUES ('EVaH2', ?, 'superadmin')").bind(adminHash).run();
+      results.push('管理员 EVaH2 已创建');
+    } else {
+      // 更新密码
+      await c.env.DB.prepare("UPDATE admins SET password_hash = ? WHERE username = 'EVaH2'").bind(adminHash).run();
+      results.push('管理员 EVaH2 密码已更新');
+    }
+    
+    // 3. 插入默认配置
+    const configs = [
+      ['default_api_url', 'https://api.oiapi.net/aiRuntime', '默认AI API地址'],
+      ['memory_max_count', '500', '每个用户/智能体最大记忆数']
+    ];
+    for (const [key, val, desc] of configs) {
+      await c.env.DB.prepare('INSERT OR IGNORE INTO config (key, value, description) VALUES (?, ?, ?)').bind(key, val, desc).run();
+    }
+    results.push('默认配置已初始化');
+    
+    // 4. 验证
+    const adminCheck = await c.env.DB.prepare("SELECT id, username, role FROM admins WHERE username = 'EVaH2'").first();
+    results.push(`管理员状态: ${JSON.stringify(adminCheck)}`);
+    
+    return c.json({ code: 0, message: '初始化成功', data: { results } });
+  } catch (err) {
+    return c.json({ code: -1, message: '初始化失败: ' + err.message, error: err.stack });
+  }
+});
 app.notFound((c) => c.json({ code: 404, message: 'Not Found' }, 404));
 app.onError((c, err) => { console.error(err); return c.json({ code: 500, message: '服务器错误' }, 500); });
 
