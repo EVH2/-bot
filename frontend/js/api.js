@@ -4,16 +4,8 @@
  */
 
 (function() {
-  // 获取当前域名，确定 API 地址
-  const currentHost = window.location.hostname;
-  const currentProtocol = window.location.protocol;
-  
-  // 开发环境：使用相对路径或本地 Worker
-  // 生产环境：使用 Cloudflare 分配的域名
-  let API_BASE_URL;
-  
-  // 如果是 Cloudflare Pages 域名或 localhost
-  let API_BASE_URL = 'https://delicate-firefly-23d6.2824387178.workers.dev/';
+  // API 基础地址 - 统一指向 Worker
+  const API_BASE_URL = 'https://delicate-firefly-23d6.2824387178.workers.dev/';
   
   /**
    * 通用 API 请求函数

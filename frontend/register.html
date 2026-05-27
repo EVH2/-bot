@@ -241,158 +241,33 @@
 
     try {
       const data = await window.api.post('/api/auth/register', {
-        username,
-        password,
-        invite_link: inviteLink || undefined
-      });
-
-      if (data.code === 0) {
-        successDiv.innerHTML = `注册成功！邀请码: ${data.data.invite_code}<br>请等待管理员审核后登录`;
-        successDiv.style.display = 'block';
-        setTimeout(() => { window.location.href = '/login'; }, 2000);
-      } else {
-        errorDiv.textContent = data.message;
-        errorDiv.style.display = 'block';
-      }
-    } catch (err) {
-      errorDiv.textContent = '注册失败：' + err.message;
-      errorDiv.style.display = 'block';
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = '注册';
-    }
-  });
-</script>
-</body>
-</html>      border: none;
-      border-radius: 40px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      margin-top: 0.5rem;
-    }
-    .btn-auth:hover {
-      background: #2e3b5e;
-      transform: scale(0.98);
-    }
-    .btn-auth:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .auth-footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      color: #4a5b7a;
-      font-size: 0.85rem;
-    }
-    .auth-footer a {
-      color: #1f2b48;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .auth-footer a:hover {
-      text-decoration: underline;
-    }
-
-    .error-msg, .success-msg {
-      padding: 0.7rem 1rem;
-      border-radius: 60px;
-      font-size: 0.85rem;
-      text-align: center;
-      margin-bottom: 1.2rem;
-      display: none;
-    }
-    .error-msg {
-      background: #fee7e5;
-      color: #b3372a;
-    }
-    .success-msg {
-      background: #e0f2e9;
-      color: #2b6e4e;
-    }
-  </style>
-</head>
-<body>
-<div class="auth-container">
-  <div class="auth-card">
-    <div class="auth-header">
-      <h1>小灵唠微信ai</h1>
-      <p>创建你的专属AI伙伴</p>
-    </div>
-
-    <div id="errorMsg" class="error-msg"></div>
-    <div id="successMsg" class="success-msg"></div>
-
-    <form id="registerForm">
-      <div class="form-group">
-        <label for="username">用户名</label>
-        <input type="text" id="username" placeholder="2-20个字符" required minlength="2" maxlength="20">
-      </div>
-
-      <div class="form-group">
-        <label for="password">密码</label>
-        <input type="password" id="password" placeholder="至少6位" required minlength="6">
-      </div>
-
-      <div class="form-group">
-        <label for="confirmPassword">确认密码</label>
-        <input type="password" id="confirmPassword" placeholder="再次输入密码" required>
-      </div>
-
-      <div id="inviteTip" class="invite-tip" style="display: none;">
-        使用邀请链接注册，双方获得奖励
-      </div>
-
-      <button type="submit" class="btn-auth" id="submitBtn">注册</button>
-    </form>
-
-    <div class="auth-footer">
-      已有账号？ <a href="/login">登录</a>
-    </div>
-  </div>
-</div>
-
 <script src="js/api.js"></script>
 <script>
   const urlParams = new URLSearchParams(window.location.search);
   const inviteLink = urlParams.get('invite_link');
-
   if (inviteLink) {
     document.getElementById('inviteTip').style.display = 'block';
     document.getElementById('registerForm').dataset.inviteLink = inviteLink;
   }
-
   document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const confirm = document.getElementById('confirmPassword').value;
     const errorDiv = document.getElementById('errorMsg');
     const successDiv = document.getElementById('successMsg');
     const submitBtn = document.getElementById('submitBtn');
-
     errorDiv.style.display = 'none';
     successDiv.style.display = 'none';
-
     if (password !== confirm) {
       errorDiv.textContent = '两次密码不一致';
       errorDiv.style.display = 'block';
       return;
     }
-
     submitBtn.disabled = true;
     submitBtn.textContent = '注册中...';
-
     try {
-      const data = await api.post('/api/auth/register', {
-        username,
-        password,
-        invite_link: inviteLink || undefined
-      });
-
+      const data = await api.post('/api/auth/register', { username, password, invite_link: inviteLink || undefined });
       if (data.code === 0) {
         successDiv.innerHTML = `注册成功！邀请码: ${data.data.invite_code}<br>请等待管理员审核后登录`;
         successDiv.style.display = 'block';

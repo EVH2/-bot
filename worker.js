@@ -23,23 +23,51 @@ async function sha256(message) {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
+
+function base64UrlEncode(data) {
+  return btoa(data).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');
+}
+function base64UrlDecode(str) {
+  str = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (str.length % 4) str += '=';
+  return atob(str);
+}
+
 class JWT {
+  static async _importKey(secret) {
+    const keyData = new TextEncoder().encode(secret);
+    return await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
+  }
+  
   static async sign(payload, secret) {
     const header = { alg: 'HS256', typ: 'JWT' };
-    const encodedHeader = btoa(JSON.stringify(header));
-    const encodedPayload = btoa(JSON.stringify({ ...payload, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 }));
-    const signature = await sha256(`${encodedHeader}.${encodedPayload}.${secret}`);
-    return `${encodedHeader}.${encodedPayload}.${signature}`;
+    const encodedHeader = base64UrlEncode(JSON.stringify(header));
+    const encodedPayload = base64UrlEncode(JSON.stringify({ 
+      ...payload, 
+      exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
+      iat: Math.floor(Date.now() / 1000)
+    }));
+    const signingInput = `${encodedHeader}.${encodedPayload}`;
+    const key = await this._importKey(secret);
+    const signature = await crypto.subtle.sign({ name: 'HMAC', hash: 'SHA-256' }, key, new TextEncoder().encode(signingInput));
+    const signatureBase64 = base64UrlEncode(String.fromCharCode(...new Uint8Array(signature)));
+    return `${signingInput}.${signatureBase64}`;
   }
+  
   static async verify(token, secret) {
     try {
-      const [encodedHeader, encodedPayload, signature] = token.split('.');
-      const expectedSignature = await sha256(`${encodedHeader}.${encodedPayload}.${secret}`);
-      if (signature !== expectedSignature) return null;
-      const payload = JSON.parse(atob(encodedPayload));
-      if (payload.exp < Date.now()) return null;
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const [encodedHeader, encodedPayload, signature] = parts;
+      const signingInput = `${encodedHeader}.${encodedPayload}`;
+      const key = await this._importKey(secret);
+      const sigBytes = Uint8Array.from(base64UrlDecode(signature), c => c.charCodeAt(0));
+      const isValid = await crypto.subtle.verify({ name: 'HMAC', hash: 'SHA-256' }, key, sigBytes, new TextEncoder().encode(signingInput));
+      if (!isValid) return null;
+      const payload = JSON.parse(base64UrlDecode(encodedPayload));
+      if (payload.exp < Math.floor(Date.now() / 1000)) return null;
       return payload;
-    } catch { return null; }
+    } catch (e) { return null; }
   }
 }
 async function getJsonBody(c) { try { return await c.req.json(); } catch { return {}; } }

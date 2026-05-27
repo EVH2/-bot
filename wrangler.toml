@@ -1,38 +1,25 @@
-# 你的 Worker 名称（必须与 Cloudflare 控制台一致）
+# ClawBot AI - Wrangler 配置
 name = "delicate-firefly-23d6"
-
-# 入口文件
 main = "worker.js"
-
-# 兼容日期（使用较新版本以支持 Cron 触发器）
 compatibility_date = "2024-11-22"
 
-# ---------------------- D1 数据库绑定 ----------------------
-# 绑定名 DB 将在 worker.js 中通过 env.DB 访问
+# D1 数据库绑定
 [[d1_databases]]
 binding = "DB"
 database_name = "clawbot-db"
-# 请替换为你在 Cloudflare D1 控制台中看到的实际数据库 ID
 database_id = "494274c8-e467-42e2-9df2-a8339502df66"
 
-# ---------------------- 环境变量 ----------------------
-# 使用标准的多行表格格式，不要使用 vars = {}
+# 环境变量
 [vars]
-JWT_SECRET = "your-super-secret-key-change-this"
+JWT_SECRET = "clawbot_jwt_secret_2026_evah2_secure"
 PLATFORM_NAME = "ClawBot AI"
 DEFAULT_REWARD_MESSAGES = "50"
-# 如果已有微信发送 API 地址，填写在此，后面在代码中使用
 WECHAT_API_URL = "https://your-clawbot-api/send"
 
-# ---------------------- 定时触发器 ----------------------
-# 四个 Cron 任务：
-# 1. 每天 8:00 早安问候
-# 2. 每天 12:00 中午问候
-# 3. 每天 22:00 晚安问候
-# 4. 每小时整点执行（用于检测两小时无聊天用户，并发送随机消息，一天一次）
+# 定时触发器
 [triggers]
 crons = [
-  "0 8 * * *", 
+  "0 8 * * *",
   "0 12 * * *",
   "0 22 * * *",
   "0 * * * *"
